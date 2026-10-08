@@ -24,10 +24,9 @@ class User extends Authenticatable
         'role',
         'status',
         'is_all_assigned',
-        'notify_transaction_buyer',
-        'notify_transaction_seller',
+        'notify_trade',
+        'notify_comment',
         'notify_chat',
-        'notify_notice',
     ];
 
     protected $hidden = [
@@ -36,13 +35,12 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'is_all_assigned'          => 'integer',
-        'notify_transaction_buyer' => 'integer',
-        'notify_transaction_seller'=> 'integer',
-        'notify_chat'              => 'integer',
-        'notify_notice'            => 'integer',
-        'created_at'               => 'datetime',
-        'updated_at'               => 'datetime',
+        'is_all_assigned' => 'integer',
+        'notify_trade'    => 'boolean',
+        'notify_comment'  => 'boolean',
+        'notify_chat'     => 'boolean',
+        'created_at'      => 'datetime',
+        'updated_at'      => 'datetime',
     ];
 
     /**

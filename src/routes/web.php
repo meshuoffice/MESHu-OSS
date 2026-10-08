@@ -74,8 +74,28 @@ Route::middleware(['auth:web'])->group(function () {
         $user = Auth::guard('web')->user();
         return view('tenant.dashboard', [
             'currentCompany' => $user->company,
+            'activeMenu'     => 'dashboard',
         ]);
     })->name('dashboard');
+
+    // 各種設定ポータル（管理者のみ）
+    Route::get('/settings', [\App\Http\Controllers\Tenant\SettingsController::class, 'index'])->name('tenant.settings');
+
+    // マイプロフィール
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\ProfileController::class, 'edit'])->name('tenant.profile');
+        Route::post('/confirm', [\App\Http\Controllers\Tenant\ProfileController::class, 'confirm'])->name('tenant.profile.confirm');
+        Route::post('/update', [\App\Http\Controllers\Tenant\ProfileController::class, 'update'])->name('tenant.profile.update');
+        Route::get('/complete', [\App\Http\Controllers\Tenant\ProfileController::class, 'complete'])->name('tenant.profile.complete');
+    });
+
+    // 事務局へのお問い合わせ
+    Route::prefix('contact')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\ContactController::class, 'index'])->name('tenant.contact');
+        Route::post('/confirm', [\App\Http\Controllers\Tenant\ContactController::class, 'confirm'])->name('tenant.contact.confirm');
+        Route::post('/send', [\App\Http\Controllers\Tenant\ContactController::class, 'send'])->name('tenant.contact.send');
+        Route::get('/complete', [\App\Http\Controllers\Tenant\ContactController::class, 'complete'])->name('tenant.contact.complete');
+    });
 });
 
 
@@ -94,3 +114,4 @@ Route::prefix('{url_code}')->middleware(['tenant'])->group(function () {
     Route::get('/reset-password', [UserPasswordResetController::class, 'showResetForm'])->name('tenant.password.reset.form');
     Route::post('/reset-password', [UserPasswordResetController::class, 'resetPassword'])->name('tenant.password.update');
 });
+
