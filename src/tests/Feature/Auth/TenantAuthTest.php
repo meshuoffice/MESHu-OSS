@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class TenantAuthTest extends TestCase
@@ -13,9 +14,9 @@ class TenantAuthTest extends TestCase
     use DatabaseTransactions;
 
     /**
-     * @test
      * 審査中（suspended）の企業ログイン画面にアクセスすると404エラーになること
      */
+    #[Test]
     public function 審査中の企業ログイン画面にアクセスすると404エラーになる()
     {
         $company = Company::create([
@@ -36,9 +37,9 @@ class TenantAuthTest extends TestCase
     }
 
     /**
-     * @test
      * 稼働中（active）の企業ログイン画面が正常に表示されること
      */
+    #[Test]
     public function 稼働中の企業ログイン画面が正常に表示される()
     {
         $company = Company::create([
@@ -60,9 +61,9 @@ class TenantAuthTest extends TestCase
     }
 
     /**
-     * @test
      * 正しいメールアドレスとパスワードでログインでき、ダッシュボードへ遷移すること
      */
+    #[Test]
     public function 正しい認証情報でログインに成功しダッシュボードへリダイレクトされる()
     {
         $company = Company::create([
@@ -98,9 +99,9 @@ class TenantAuthTest extends TestCase
     }
 
     /**
-     * @test
      * パスワードが誤っている場合はログインに失敗しエラーメッセージが返ること
      */
+    #[Test]
     public function 誤ったパスワードの場合はログインに失敗する()
     {
         $company = Company::create([
@@ -137,9 +138,9 @@ class TenantAuthTest extends TestCase
     }
 
     /**
-     * @test
      * ログアウト処理が正常に完了し、企業ログイン画面またはトップへ遷移すること
      */
+    #[Test]
     public function ログアウト処理が正常に動作する()
     {
         $company = Company::create([

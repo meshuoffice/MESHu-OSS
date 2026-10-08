@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('admin::layouts.admin')
 
 @section('title', $title ?? '新規企業登録 | MESHu 事務局管理')
 

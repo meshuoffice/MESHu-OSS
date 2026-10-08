@@ -1,11 +1,11 @@
-@extends('layouts.admin')
+@extends('admin::layouts.admin')
 
 @section('title', $title ?? ($company->name . ' 詳細 | MESHu 事務局管理'))
 
 @section('content')
 @php
     $owner = Auth::guard('admin')->user();
-    $ownerRole = $owner->role ?? session('admin_owner_role') ?? 'viewer';
+    $ownerRole = $owner->role ?? 'viewer';
 @endphp
 
 <!-- パンくずリスト & ページタイトル -->

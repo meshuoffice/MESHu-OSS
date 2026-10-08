@@ -5,10 +5,10 @@ namespace Tests\Feature\Signup;
 use App\Mail\AdminSignupNotificationMail;
 use App\Mail\WelcomeSignupMail;
 use App\Models\Company;
-use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class SignupTest extends TestCase
@@ -16,20 +16,20 @@ class SignupTest extends TestCase
     use DatabaseTransactions;
 
     /**
-     * @test
      * 新規登録フォーム画面（/signup）が正常に表示されること
      */
+    #[Test]
     public function 新規登録フォーム画面が正常に表示される()
     {
         $response = $this->get('/signup');
         $response->assertStatus(200);
-        $response->assertSee('新規企業登録');
+        $response->assertSee('アカウント新規登録');
     }
 
     /**
-     * @test
      * 法人番号やカナのバリデーションが正しく機能すること
      */
+    #[Test]
     public function バリデーションエラー時は確認画面に進めずエラーが返る()
     {
         // 1. 企業名カナに漢字を含めた場合
@@ -69,12 +69,50 @@ class SignupTest extends TestCase
         ]);
 
         $response->assertSessionHasErrors('corporateNumber');
+
+        // 3. 電話番号に英字が含まれる場合（例: 00-0000-aaaa）
+        $response = $this->post('/signup/confirm', [
+            'companyName'      => 'テスト企業',
+            'companyNameShort' => 'テスト',
+            'companyNameKana'  => 'テストカナ',
+            'corporateNumber'  => '1234567890123',
+            'phone'            => '00-0000-aaaa', // 不正な英字混入
+            'zipCode'          => '1000001',
+            'prefecture'       => '東京都',
+            'city'             => '千代田区',
+            'address'          => '1-1',
+            'adminName'        => '山田太郎',
+            'adminNameKana'    => 'ヤマダタロウ',
+            'adminEmail'       => 'admin@test.com',
+            'agreeTerms'       => '1',
+        ]);
+
+        $response->assertSessionHasErrors('phone');
+
+        // 4. 郵便番号に英字・不正文字列が含まれる場合（例: abc-xy）
+        $response = $this->post('/signup/confirm', [
+            'companyName'      => 'テスト企業',
+            'companyNameShort' => 'テスト',
+            'companyNameKana'  => 'テストカナ',
+            'corporateNumber'  => '1234567890123',
+            'phone'            => '03-1234-5678',
+            'zipCode'          => 'abc-xy', // 不正な文字列
+            'prefecture'       => '東京都',
+            'city'             => '千代田区',
+            'address'          => '1-1',
+            'adminName'        => '山田太郎',
+            'adminNameKana'    => 'ヤマダタロウ',
+            'adminEmail'       => 'admin@test.com',
+            'agreeTerms'       => '1',
+        ]);
+
+        $response->assertSessionHasErrors('zipCode');
     }
 
     /**
-     * @test
      * 正しい入力で新規登録が完了し、企業がsuspendedで作成され、メールが送信されること
      */
+    #[Test]
     public function 新規登録が成功し企業が審査中ステータスで作成されメールが送信される()
     {
         Mail::fake();
@@ -105,7 +143,7 @@ class SignupTest extends TestCase
                          ->post('/signup/register');
 
         $response->assertStatus(200);
-        $response->assertSee('アカウントの登録が完了しました');
+        $response->assertSee('アカウント登録申請を受け付けました');
 
         // 3. データベースの検証
         $this->assertDatabaseHas('companies', [

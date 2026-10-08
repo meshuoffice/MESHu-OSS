@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\Owner;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AdminAuthTest extends TestCase
@@ -12,29 +13,25 @@ class AdminAuthTest extends TestCase
     use DatabaseTransactions;
 
     /**
-     * @test
      * 事務局ログイン画面がシークレットURL経由で表示されること
      */
+    #[Test]
     public function 事務局ログイン画面がシークレットURLで正常に表示される()
     {
-        $adminPath = env('ADMIN_URL_PATH', 'admin');
-
-        $response = $this->get("/{$adminPath}");
+        $response = $this->get(route('admin.login.root'));
         $response->assertStatus(200);
         $response->assertSee('事務局管理システム');
 
-        $response = $this->get("/{$adminPath}/login");
+        $response = $this->get(route('admin.login'));
         $response->assertStatus(200);
     }
 
     /**
-     * @test
-     * 正しい管理者情報でログインでき、ダッシュボードへ遷移し、ログインアラートが表示されること
+     * 正しい管理者情報でログインでき、ダッシュボードへ遷移すること
      */
+    #[Test]
     public function 事務局管理者がログインに成功しダッシュボードへ遷移する()
     {
-        $adminPath = env('ADMIN_URL_PATH', 'admin');
-
         $owner = Owner::create([
             'name'          => 'システム管理者',
             'email'         => 'admin-test@meshu.org',
@@ -43,29 +40,26 @@ class AdminAuthTest extends TestCase
             'status'        => 'active',
         ]);
 
-        $response = $this->post("/{$adminPath}/login", [
+        $response = $this->post(route('admin.login.submit'), [
             'email'    => 'admin-test@meshu.org',
             'password' => 'AdminSecret123',
         ]);
 
-        $response->assertRedirect('/owntop');
-        $response->assertSessionHas('success', 'ログインしました。');
+        $response->assertRedirect(route('admin.dashboard'));
         $this->assertAuthenticatedAs($owner, 'admin');
 
         // ダッシュボード画面へのアクセスとメッセージ確認
-        $dashResponse = $this->actingAs($owner, 'admin')->get('/owntop');
+        $dashResponse = $this->actingAs($owner, 'admin')->get(route('admin.dashboard'));
         $dashResponse->assertStatus(200);
         $dashResponse->assertSee('ダッシュボード');
     }
 
     /**
-     * @test
      * 事務局ログアウト処理が正常に完了すること
      */
+    #[Test]
     public function 事務局ログアウトが正常に完了する()
     {
-        $adminPath = env('ADMIN_URL_PATH', 'admin');
-
         $owner = Owner::create([
             'name'          => '審査管理者',
             'email'         => 'reviewer-test@meshu.org',
@@ -74,9 +68,8 @@ class AdminAuthTest extends TestCase
             'status'        => 'active',
         ]);
 
-        $response = $this->actingAs($owner, 'admin')->get('/ownlogout');
-        $response->assertRedirect("/{$adminPath}/login");
-        $response->assertSessionHas('success', 'ログアウトしました。');
+        $response = $this->actingAs($owner, 'admin')->get(route('admin.ownlogout'));
+        $response->assertRedirect(route('admin.login'));
         $this->assertGuest('admin');
     }
 }

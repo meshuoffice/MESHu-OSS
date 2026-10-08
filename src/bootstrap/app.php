@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\AdminIpRestriction;
 use App\Http\Middleware\CompanyTenant;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,11 +12,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // カスタムミドルウェアのエイリアス登録
-        $middleware->alias([
-            'tenant'   => CompanyTenant::class,
-            'admin.ip' => AdminIpRestriction::class,
-        ]);
+        $aliases = [
+            'tenant' => CompanyTenant::class,
+        ];
+
+        // 事務局モジュールが存在する場合のみIP制限ミドルウェアをエイリアス登録
+        if (class_exists(\Modules\Admin\Middleware\AdminIpRestriction::class)) {
+            $aliases['admin.ip'] = \Modules\Admin\Middleware\AdminIpRestriction::class;
+        }
+
+        $middleware->alias($aliases);
 
         // 認証後のリダイレクト先や未ログイン時のリダイレクト先カスタマイズ
         $middleware->redirectGuestsTo(function ($request) {

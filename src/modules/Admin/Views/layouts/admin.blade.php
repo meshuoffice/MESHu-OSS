@@ -2,12 +2,12 @@
 $owner = Auth::guard('admin')->user();
 $currentOwnerName = $owner->name ?? '事務局管理者';
 $currentOwnerRole = $owner->role ?? 'admin';
-$roleLabel = [
+$roleLabels = [
     'admin'    => 'システム管理者',
     'reviewer' => '審査担当者',
     'viewer'   => '閲覧のみ',
-][$currentOwnerRole] ?? '管理者';
-
+];
+$roleLabel = $roleLabels[$currentOwnerRole] ?? '管理者';
 $activeMenu = $activeMenu ?? '';
 @endphp
 <!DOCTYPE html>
