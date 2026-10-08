@@ -8,6 +8,7 @@ use App\Models\Owner;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AdminCompanyManagementTest extends TestCase
@@ -19,23 +20,23 @@ class AdminCompanyManagementTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->adminOwner = Owner::create([
-            'name'          => '最高管理者',
-            'email'         => 'super-admin@meshu.org',
-            'password_hash' => Hash::make('AdminPass123'),
-            'role'          => 'admin',
-            'status'        => 'active',
-        ]);
+        $this->adminOwner = Owner::firstOrCreate(
+            ['email' => 'super-admin@meshu.org'],
+            [
+                'name'          => '最高管理者',
+                'password_hash' => Hash::make('AdminPass123'),
+                'role'          => 'admin',
+                'status'        => 'active',
+            ]
+        );
     }
 
-    /**
-     * @test
-     * 企業一覧画面（/owncorp）が正常に表示され検索できること
-     */
+    #[Test]
     public function 企業一覧が正常に表示されキーワード検索できる()
     {
-        $company1 = Company::create([
-            'url_code'         => 'search-target-corp',
+        $unique = uniqid();
+        Company::create([
+            'url_code'         => 'search-target-' . $unique,
             'name'             => '検索対象商事株式会社',
             'abbreviated_name' => '検索対象',
             'abbreviated_kana' => 'ケンサクタイショウ',
@@ -48,8 +49,8 @@ class AdminCompanyManagementTest extends TestCase
             'status'           => 'active',
         ]);
 
-        $company2 = Company::create([
-            'url_code'         => 'other-corp',
+        Company::create([
+            'url_code'         => 'other-corp-' . $unique,
             'name'             => '別会社株式会社',
             'abbreviated_name' => '別会社',
             'abbreviated_kana' => 'ベツガイシャ',
@@ -62,22 +63,20 @@ class AdminCompanyManagementTest extends TestCase
             'status'           => 'active',
         ]);
 
-        $response = $this->actingAs($this->adminOwner, 'admin')
-                         ->get('/owncorp?keyword=検索対象');
+        $url = route('admin.corp.index', ['keyword' => '検索対象']);
+        $response = $this->actingAs($this->adminOwner, 'admin')->get($url);
 
         $response->assertStatus(200);
         $response->assertSee('検索対象商事株式会社');
         $response->assertDontSee('別会社株式会社');
     }
 
-    /**
-     * @test
-     * 企業詳細画面（/owncorp/show/{id}）が正常に表示されること
-     */
+    #[Test]
     public function 企業詳細画面が正常に表示される()
     {
+        $unique = uniqid();
         $company = Company::create([
-            'url_code'         => 'detail-corp',
+            'url_code'         => 'detail-corp-' . $unique,
             'name'             => '詳細表示企業株式会社',
             'abbreviated_name' => '詳細企業',
             'abbreviated_kana' => 'ショウサイキギョウ',
@@ -90,9 +89,9 @@ class AdminCompanyManagementTest extends TestCase
             'status'           => 'active',
         ]);
 
-        $user = User::create([
+        User::create([
             'company_id'      => $company->id,
-            'email'           => 'admin@detail-corp.com',
+            'email'           => 'admin-' . $unique . '@detail-corp.com',
             'password_hash'   => Hash::make('Password123'),
             'user_name'       => '詳細担当者',
             'role'            => 'admin',
@@ -100,55 +99,20 @@ class AdminCompanyManagementTest extends TestCase
             'is_all_assigned' => 0,
         ]);
 
-        $response = $this->actingAs($this->adminOwner, 'admin')
-                         ->get("/owncorp/show/{$company->id}");
+        $url = route('admin.corp.show', $company->id);
+        $response = $this->actingAs($this->adminOwner, 'admin')->get($url);
 
         $response->assertStatus(200);
         $response->assertSee('詳細表示企業株式会社');
         $response->assertSee('詳細担当者');
     }
 
-    /**
-     * @test
-     * 事務局管理者が企業の審査承認（suspended → active）を行えること
-     */
-    public function 事務局管理者が企業ステータスを稼働中に変更できる()
-    {
-        $company = Company::create([
-            'url_code'         => 'approve-target-corp',
-            'name'             => '承認待ち企業株式会社',
-            'abbreviated_name' => '承認待ち',
-            'abbreviated_kana' => 'ショウニンマチ',
-            'tel'              => '03-7777-8888',
-            'zip_code'         => '1000001',
-            'prefecture_code'  => 13,
-            'city'             => '千代田区',
-            'address'          => '1-1',
-            'status'           => 'suspended',
-        ]);
-
-        $response = $this->actingAs($this->adminOwner, 'admin')
-                         ->post("/owncorp/delete/{$company->id}", [
-                             'status' => 'active',
-                         ]);
-
-        $response->assertRedirect('/owncorp');
-        $response->assertSessionHas('success');
-
-        $this->assertDatabaseHas('companies', [
-            'id'     => $company->id,
-            'status' => 'active',
-        ]);
-    }
-
-    /**
-     * @test
-     * 認証バッジの付与と解除のトグル操作が正常に行えること
-     */
+    #[Test]
     public function 認証バッジの付与と解除が正常にトグル動作する()
     {
+        $unique = uniqid();
         $company = Company::create([
-            'url_code'         => 'badge-corp',
+            'url_code'         => 'badge-corp-' . $unique,
             'name'             => 'バッジ検証企業株式会社',
             'abbreviated_name' => 'バッジ検証',
             'abbreviated_kana' => 'バッジケンショウ',
@@ -160,35 +124,31 @@ class AdminCompanyManagementTest extends TestCase
             'status'           => 'active',
         ]);
 
-        // 1. バッジ付与（初回）
-        $response = $this->actingAs($this->adminOwner, 'admin')
-                         ->post("/owncorp/toggle-badge/{$company->id}");
+        $toggleUrl = route('admin.corp.toggle_badge', $company->id);
+        $showUrl = route('admin.corp.show', $company->id);
 
-        $response->assertRedirect("/owncorp/show/{$company->id}");
+        // 1. バッジ付与
+        $response1 = $this->actingAs($this->adminOwner, 'admin')->post($toggleUrl);
+        $response1->assertRedirect($showUrl);
         $this->assertDatabaseHas('company_badges', [
             'company_id' => $company->id,
             'status'     => 'active',
         ]);
 
-        // 2. バッジ解除（2回目）
-        $response = $this->actingAs($this->adminOwner, 'admin')
-                         ->post("/owncorp/toggle-badge/{$company->id}");
-
-        $response->assertRedirect("/owncorp/show/{$company->id}");
-        $this->assertDatabaseHas('company_badges', [
+        // 2. バッジ解除
+        $response2 = $this->actingAs($this->adminOwner, 'admin')->post($toggleUrl);
+        $response2->assertRedirect($showUrl);
+        $this->assertDatabaseMissing('company_badges', [
             'company_id' => $company->id,
-            'status'     => 'revoked',
         ]);
     }
 
-    /**
-     * @test
-     * 事務局からの代理ログイン（impersonate）で企業ダッシュボードへ遷移できること
-     */
+    #[Test]
     public function 代理ログインにより企業ダッシュボードへ直接ログイン遷移できる()
     {
+        $unique = uniqid();
         $company = Company::create([
-            'url_code'         => 'impersonate-corp',
+            'url_code'         => 'impersonate-corp-' . $unique,
             'name'             => '代理ログイン対象企業',
             'abbreviated_name' => '代理対象',
             'abbreviated_kana' => 'ダイリタイショウ',
@@ -202,7 +162,7 @@ class AdminCompanyManagementTest extends TestCase
 
         $adminUser = User::create([
             'company_id'      => $company->id,
-            'email'           => 'admin@impersonate-corp.com',
+            'email'           => 'admin-' . $unique . '@impersonate-corp.com',
             'password_hash'   => Hash::make('Password123'),
             'user_name'       => '代理対象管理者',
             'role'            => 'admin',
@@ -210,11 +170,159 @@ class AdminCompanyManagementTest extends TestCase
             'is_all_assigned' => 0,
         ]);
 
-        $response = $this->actingAs($this->adminOwner, 'admin')
-                         ->get("/owncorp/impersonate/{$company->id}");
+        $impersonateUrl = route('admin.corp.impersonate', $company->id);
+        $response = $this->actingAs($this->adminOwner, 'admin')->get($impersonateUrl);
 
-        $response->assertRedirect('/dashboard');
+        $response->assertRedirect(route('dashboard'));
         $this->assertAuthenticatedAs($adminUser, 'web');
-        $this->assertTrue(session('is_impersonating'));
+        $this->assertTrue(session('impersonated_by_admin'));
+
+        // 代理ログイン画面（別タブ）からのログアウト
+        $logoutResponse = $this->post('/logout');
+        $logoutResponse->assertRedirect('/' . $company->url_code . '/login');
+        $this->assertGuest('web');
+        $this->assertAuthenticatedAs($this->adminOwner, 'admin');
+    }
+
+    /**
+     * 企業のステータス変更（稼働化・一時停止・削除状態）が物理削除されずに正しく更新されること
+     */
+    #[Test]
+    public function 企業ステータス変更が物理削除されず正常に更新される()
+    {
+        $unique = uniqid();
+        // 新規登録直後の審査待ち企業（suspended）
+        $company = Company::create([
+            'url_code'         => 'status-test-' . $unique,
+            'name'             => 'ステータス検証株式会社',
+            'abbreviated_name' => 'ステータス検証',
+            'abbreviated_kana' => 'ステータスケンショウ',
+            'tel'              => '03-5555-4444',
+            'zip_code'         => '1000001',
+            'prefecture_code'  => 13,
+            'city'             => '千代田区',
+            'address'          => '1-1',
+            'status'           => 'suspended',
+        ]);
+
+        $user = User::create([
+            'company_id'      => $company->id,
+            'email'           => 'admin-' . $unique . '@status-corp.com',
+            'password_hash'   => Hash::make('Password123'),
+            'user_name'       => '審査担当者',
+            'role'            => 'admin',
+            'status'          => 'suspended',
+            'is_all_assigned' => 0,
+        ]);
+
+        $deleteUrl = route('admin.corp.delete', $company->id);
+        $showUrl = route('admin.corp.show', $company->id);
+
+        // 1. 稼働（active）に更新（承認・有効化）
+        $response = $this->actingAs($this->adminOwner, 'admin')
+            ->post($deleteUrl, ['status' => 'active']);
+
+        $response->assertRedirect($showUrl);
+        $this->assertDatabaseHas('companies', [
+            'id'     => $company->id,
+            'status' => 'active',
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id'     => $user->id,
+            'status' => 'active',
+        ]);
+
+        // 2. 一時停止（suspended）に更新
+        $response = $this->actingAs($this->adminOwner, 'admin')
+            ->post($deleteUrl, ['status' => 'suspended']);
+
+        $response->assertRedirect($showUrl);
+        $this->assertDatabaseHas('companies', [
+            'id'     => $company->id,
+            'status' => 'suspended',
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id'     => $user->id,
+            'status' => 'suspended',
+        ]);
+
+        // 3. 削除状態（deleted）に更新（論理削除）
+        $response = $this->actingAs($this->adminOwner, 'admin')
+            ->post($deleteUrl, ['status' => 'deleted']);
+
+        $response->assertRedirect($showUrl);
+        $this->assertDatabaseHas('companies', [
+            'id'     => $company->id,
+            'status' => 'deleted',
+        ]);
+        $this->assertDatabaseHas('users', [
+            'id'     => $user->id,
+            'status' => 'deleted',
+        ]);
+    }
+
+    /**
+     * 企業編集画面の表示、確認画面、および更新保存が正常に行えること
+     */
+    #[Test]
+    public function 企業情報の編集確認および更新保存が正常に行える()
+    {
+        $unique = uniqid();
+        $company = Company::create([
+            'url_code'         => 'edit-test-' . $unique,
+            'name'             => '変更前株式会社',
+            'abbreviated_name' => '変更前',
+            'abbreviated_kana' => 'ヘンコウマエ',
+            'tel'              => '03-9999-0000',
+            'zip_code'         => '1000001',
+            'prefecture_code'  => 13,
+            'city'             => '千代田区',
+            'address'          => '1-1',
+            'status'           => 'active',
+        ]);
+
+        // 1. 編集画面の表示
+        $editUrl = route('admin.corp.edit', $company->id);
+        $editResponse = $this->actingAs($this->adminOwner, 'admin')->get($editUrl);
+        $editResponse->assertStatus(200);
+        $editResponse->assertSee('変更前株式会社');
+
+        // 2. 確認画面へのPOST
+        $confirmUrl = route('admin.corp.confirm');
+        $confirmData = [
+            'id'               => $company->id,
+            'name'             => '変更後株式会社',
+            'abbreviated_name' => '変更後',
+            'abbreviated_kana' => 'ヘンコウゴ',
+            'url_code'         => 'edit-test-' . $unique,
+            'tel'              => '03-8888-7777',
+            'zip_code'         => '1000002',
+            'prefecture_code'  => 13,
+            'city'             => '千代田区皇居外苑',
+            'address'          => '2-2',
+            'grant_badge'      => '1',
+            'status'           => 'active',
+        ];
+        $confirmResponse = $this->actingAs($this->adminOwner, 'admin')->post($confirmUrl, $confirmData);
+        $confirmResponse->assertStatus(200);
+        $confirmResponse->assertSee('変更後株式会社');
+
+        // 3. 完了処理（DB保存）
+        $completeUrl = route('admin.corp.complete');
+        $completeResponse = $this->actingAs($this->adminOwner, 'admin')->post($completeUrl);
+        $completeResponse->assertStatus(200);
+
+        // DBに更新内容が反映されていること
+        $this->assertDatabaseHas('companies', [
+            'id'               => $company->id,
+            'name'             => '変更後株式会社',
+            'abbreviated_name' => '変更後',
+            'tel'              => '03-8888-7777',
+        ]);
+        // バッジが付与されていること
+        $this->assertDatabaseHas('company_badges', [
+            'company_id' => $company->id,
+            'status'     => 'active',
+        ]);
     }
 }

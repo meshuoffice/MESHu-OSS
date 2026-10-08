@@ -87,16 +87,38 @@ class UserAuthController extends Controller
      */
     public function logout(Request $request): RedirectResponse
     {
-        $companyUrlCode = session('company_url_code');
+        $user = Auth::guard('web')->user();
+        $companyUrlCode = session('company_url_code') ?: session('current_url_code') ?: $user?->company?->url_code;
+        $isImpersonatedByAdmin = session('impersonated_by_admin', false);
+        $isAdminLoggedIn     = Auth::guard('admin')->check();
 
+        // 企業ユーザーセッションのみログアウト
         Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // 事務局管理者がログイン中の場合（代理ログイン中含む）は、事務局セッション（adminガード）を維持し、企業側のセッション情報のみ破棄
+        if ($isAdminLoggedIn || $isImpersonatedByAdmin) {
+            $request->session()->forget([
+                'impersonated_by_admin',
+                'is_impersonating',
+                'user_id',
+                'user_name',
+                'user_email',
+                'user_role',
+                'role',
+                'company_id',
+                'company_name',
+                'company_url_code',
+                'is_user_logged_in',
+            ]);
+            $request->session()->regenerateToken();
+        } else {
+            // 通常の一般ユーザーログアウト時はセッション全体を無効化
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
-        // ログアウト後は自社のログインURL (/{url_code}) へリダイレクト
         if ($companyUrlCode) {
-            return redirect('/' . $companyUrlCode)->with('status', 'ログアウトしました。');
+            return redirect('/' . $companyUrlCode . '/login')->with('status', 'ログアウトしました。');
         }
 
         return redirect('/')->with('status', 'ログアウトしました。');

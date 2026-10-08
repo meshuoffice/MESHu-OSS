@@ -1,8 +1,8 @@
-@extends('layouts.admin')
+@extends('admin::layouts.admin')
 
 @php
 $isEdit = !empty($isEdit);
-$targetAction = $isEdit ? route('admin.corp.update', ['id' => $companyId ?? '']) : route('admin.corp.complete');
+$targetAction = route('admin.corp.complete');
 @endphp
 
 @section('title', $title ?? ($isEdit ? '企業情報更新確認 | MESHu 事務局管理' : '企業登録確認 | MESHu 事務局管理'))

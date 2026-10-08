@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('admin::layouts.admin')
 
 @section('title', $title ?? '企業管理 | MESHu 事務局管理')
 
@@ -142,7 +142,7 @@
         <span class="small text-muted">全 {{ number_format($companies->total()) }} 件中 {{ $companies->total() > 0 ? $companies->firstItem() . '-' . $companies->lastItem() : '0' }} 件を表示</span>
         @if ($companies->hasPages())
             <div>
-                {{ $companies->links('pagination::bootstrap-5') }}
+                {{ $companies->links() }}
             </div>
         @endif
     </div>

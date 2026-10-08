@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminAuthController;
-use App\Http\Controllers\Admin\AdminCompanyController;
-use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Auth\UserPasswordResetController;
 use App\Http\Controllers\SignupController;
@@ -29,42 +26,7 @@ Route::prefix('signup')->group(function () {
 });
 
 
-// 3. 事務局管理ルーティング（シークレットURL & IP制限）
-$adminUrlPath = env('ADMIN_URL_PATH', 'admin');
-
-Route::prefix($adminUrlPath)->middleware(['admin.ip'])->group(function () {
-    Route::get('/', [AdminAuthController::class, 'showLoginForm'])->name('admin.login.root');
-    Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('/', [AdminAuthController::class, 'login'])->name('admin.login.root.submit');
-    Route::post('/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
-    Route::get('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout.post');
-});
-
-Route::middleware(['admin.ip', 'auth:admin'])->group(function () {
-    Route::get('/owntop', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-
-    Route::get('/ownlogout', [AdminAuthController::class, 'logout'])->name('admin.ownlogout');
-
-    // 企業管理 (owncorp)
-    Route::prefix('owncorp')->group(function () {
-        Route::get('/', [AdminCompanyController::class, 'index'])->name('admin.corp.index');
-        Route::get('/index', [AdminCompanyController::class, 'index']);
-        Route::get('/registration', [AdminCompanyController::class, 'registration'])->name('admin.corp.registration');
-        Route::post('/confirm', [AdminCompanyController::class, 'confirm'])->name('admin.corp.confirm');
-        Route::post('/complete', [AdminCompanyController::class, 'complete'])->name('admin.corp.complete');
-        Route::get('/show/{id}', [AdminCompanyController::class, 'show'])->name('admin.corp.show');
-        Route::get('/edit/{id}', [AdminCompanyController::class, 'edit'])->name('admin.corp.edit');
-        Route::post('/update/{id}', [AdminCompanyController::class, 'update'])->name('admin.corp.update');
-        Route::get('/delete/{id}', [AdminCompanyController::class, 'deleteConfirm'])->name('admin.corp.delete.confirm');
-        Route::post('/delete/{id}', [AdminCompanyController::class, 'delete'])->name('admin.corp.delete');
-        Route::post('/toggle-badge/{id}', [AdminCompanyController::class, 'toggleBadge'])->name('admin.corp.toggle_badge');
-        Route::get('/impersonate/{id}', [AdminCompanyController::class, 'impersonate'])->name('admin.corp.impersonate');
-    });
-});
-
-
-// 4. ユーザー企業向けポータル（ログイン後共通ルート：auth:web 保護）
+// 3. ユーザー企業向けポータル（ログイン後共通ルート：auth:web 保護）
 Route::middleware(['auth:web'])->group(function () {
     // ログアウト
     Route::match(['get', 'post'], '/logout', [UserAuthController::class, 'logout'])->name('logout');
@@ -74,10 +36,33 @@ Route::middleware(['auth:web'])->group(function () {
         $user = Auth::guard('web')->user();
         return view('tenant.dashboard', [
             'currentCompany' => $user->company,
+            'activeMenu'     => 'dashboard',
         ]);
     })->name('dashboard');
+
+    // 各種設定ポータル（管理者のみ）
+    Route::get('/settings', [\App\Http\Controllers\Tenant\SettingsController::class, 'index'])->name('tenant.settings');
+
+    // マイプロフィール
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\ProfileController::class, 'edit'])->name('tenant.profile');
+        Route::post('/confirm', [\App\Http\Controllers\Tenant\ProfileController::class, 'confirm'])->name('tenant.profile.confirm');
+        Route::post('/update', [\App\Http\Controllers\Tenant\ProfileController::class, 'update'])->name('tenant.profile.update');
+        Route::get('/complete', [\App\Http\Controllers\Tenant\ProfileController::class, 'complete'])->name('tenant.profile.complete');
+    });
+
+    // 事務局へのお問い合わせ
+    Route::prefix('contact')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\ContactController::class, 'index'])->name('tenant.contact');
+        Route::post('/confirm', [\App\Http\Controllers\Tenant\ContactController::class, 'confirm'])->name('tenant.contact.confirm');
+        Route::post('/send', [\App\Http\Controllers\Tenant\ContactController::class, 'send'])->name('tenant.contact.send');
+        Route::get('/complete', [\App\Http\Controllers\Tenant\ContactController::class, 'complete'])->name('tenant.contact.complete');
+    });
 });
 
+
+// グローバルURLパラメータ制約（システム予約ルートや事務局ルートとの競合回避）
+Route::pattern('url_code', '^(?!(signup|dashboard|settings|profile|contact|logout|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
 
 // 5. 企業別ログイン・パスワード再設定ルート（/{url_code}）
 Route::prefix('{url_code}')->middleware(['tenant'])->group(function () {
@@ -94,3 +79,4 @@ Route::prefix('{url_code}')->middleware(['tenant'])->group(function () {
     Route::get('/reset-password', [UserPasswordResetController::class, 'showResetForm'])->name('tenant.password.reset.form');
     Route::post('/reset-password', [UserPasswordResetController::class, 'resetPassword'])->name('tenant.password.update');
 });
+

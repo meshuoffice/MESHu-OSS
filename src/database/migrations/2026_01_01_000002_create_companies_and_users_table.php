@@ -96,10 +96,9 @@ return new class extends Migration
             $table->string('role', 20)->default('staff'); // admin, staff
             $table->string('status', 20)->default('active'); // suspended, active, deleted
             $table->smallInteger('is_all_assigned')->default(0); // 0: 全担当, 1: 担当分け
-            $table->smallInteger('notify_transaction_buyer')->default(1);
-            $table->smallInteger('notify_transaction_seller')->default(1);
-            $table->smallInteger('notify_chat')->default(1);
-            $table->smallInteger('notify_notice')->default(1);
+            $table->boolean('notify_trade')->default(true);
+            $table->boolean('notify_comment')->default(true);
+            $table->boolean('notify_chat')->default(true);
             $table->timestamps();
 
             $table->unique(['company_id', 'email']);
@@ -118,10 +117,9 @@ return new class extends Migration
         DB::statement("COMMENT ON COLUMN users.role IS '社内権限（admin: 管理者, staff: 一般社員）'");
         DB::statement("COMMENT ON COLUMN users.status IS 'ユーザーアカウント状態（suspended: 停止中, active: 稼働, deleted: 削除済）'");
         DB::statement("COMMENT ON COLUMN users.is_all_assigned IS '取引先担当区分（0: 全担当[デフォルト], 1: 担当分け）'");
-        DB::statement("COMMENT ON COLUMN users.notify_transaction_buyer IS '買手取引通知メール (0: OFF, 1: ON)'");
-        DB::statement("COMMENT ON COLUMN users.notify_transaction_seller IS '売手取引通知メール (0: OFF, 1: ON)'");
-        DB::statement("COMMENT ON COLUMN users.notify_chat IS 'チャット受信通知メール (0: OFF, 1: ON)'");
-        DB::statement("COMMENT ON COLUMN users.notify_notice IS '重要お知らせ通知メール (0: OFF, 1: ON)'");
+        DB::statement("COMMENT ON COLUMN users.notify_trade IS '取引通知メール (true: ON, false: OFF)'");
+        DB::statement("COMMENT ON COLUMN users.notify_comment IS 'コメント通知メール (true: ON, false: OFF)'");
+        DB::statement("COMMENT ON COLUMN users.notify_chat IS 'チャット通知メール (true: ON, false: OFF)'");
         DB::statement("COMMENT ON COLUMN users.created_at IS '登録日時'");
         DB::statement("COMMENT ON COLUMN users.updated_at IS '更新日時'");
     }

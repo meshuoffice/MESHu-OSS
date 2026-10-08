@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('admin::layouts.admin')
 
 @section('title', $title ?? ($company->name . ' 編集 | MESHu 事務局管理'))
 
