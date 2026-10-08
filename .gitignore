@@ -1,0 +1,35 @@
+# Laravel & PHP
+src/.env
+src/.env.backup
+src/.env.production
+src/vendor/
+src/node_modules/
+src/public/build/
+src/public/hot/
+src/public/storage
+src/storage/*.key
+src/storage/pail/
+src/storage/logs/*.log
+src/storage/framework/cache/data/*
+src/storage/framework/sessions/*
+src/storage/framework/views/*
+src/storage/framework/testing/*
+src/.phpunit.cache/
+src/.phpunit.result.cache
+
+# Keep empty directories in storage
+!src/storage/framework/cache/data/.gitignore
+!src/storage/framework/sessions/.gitignore
+!src/storage/framework/views/.gitignore
+!src/storage/framework/testing/.gitignore
+!src/storage/logs/.gitignore
+
+# System & Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.fleet/
+.nova/
+.zed/
+*.log

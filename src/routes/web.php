@@ -1,0 +1,96 @@
+<?php
+
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\AdminCompanyController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\Auth\UserPasswordResetController;
+use App\Http\Controllers\SignupController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// 1. パブリック トップページ (LP)
+Route::get('/', function () {
+    return view('welcome');
+})->name('home');
+
+
+// 2. アカウント新規登録（Signup）ルート
+Route::prefix('signup')->group(function () {
+    Route::get('/', [SignupController::class, 'index'])->name('signup');
+    Route::post('/confirm', [SignupController::class, 'confirm'])->name('signup.confirm');
+    Route::post('/register', [SignupController::class, 'register'])->name('signup.register');
+});
+
+
+// 3. 事務局管理ルーティング（シークレットURL & IP制限）
+$adminUrlPath = env('ADMIN_URL_PATH', 'admin');
+
+Route::prefix($adminUrlPath)->middleware(['admin.ip'])->group(function () {
+    Route::get('/', [AdminAuthController::class, 'showLoginForm'])->name('admin.login.root');
+    Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/', [AdminAuthController::class, 'login'])->name('admin.login.root.submit');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+    Route::get('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout.post');
+});
+
+Route::middleware(['admin.ip', 'auth:admin'])->group(function () {
+    Route::get('/owntop', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+    Route::get('/ownlogout', [AdminAuthController::class, 'logout'])->name('admin.ownlogout');
+
+    // 企業管理 (owncorp)
+    Route::prefix('owncorp')->group(function () {
+        Route::get('/', [AdminCompanyController::class, 'index'])->name('admin.corp.index');
+        Route::get('/index', [AdminCompanyController::class, 'index']);
+        Route::get('/registration', [AdminCompanyController::class, 'registration'])->name('admin.corp.registration');
+        Route::post('/confirm', [AdminCompanyController::class, 'confirm'])->name('admin.corp.confirm');
+        Route::post('/complete', [AdminCompanyController::class, 'complete'])->name('admin.corp.complete');
+        Route::get('/show/{id}', [AdminCompanyController::class, 'show'])->name('admin.corp.show');
+        Route::get('/edit/{id}', [AdminCompanyController::class, 'edit'])->name('admin.corp.edit');
+        Route::post('/update/{id}', [AdminCompanyController::class, 'update'])->name('admin.corp.update');
+        Route::get('/delete/{id}', [AdminCompanyController::class, 'deleteConfirm'])->name('admin.corp.delete.confirm');
+        Route::post('/delete/{id}', [AdminCompanyController::class, 'delete'])->name('admin.corp.delete');
+        Route::post('/toggle-badge/{id}', [AdminCompanyController::class, 'toggleBadge'])->name('admin.corp.toggle_badge');
+        Route::get('/impersonate/{id}', [AdminCompanyController::class, 'impersonate'])->name('admin.corp.impersonate');
+    });
+});
+
+
+// 4. ユーザー企業向けポータル（ログイン後共通ルート：auth:web 保護）
+Route::middleware(['auth:web'])->group(function () {
+    // ログアウト
+    Route::match(['get', 'post'], '/logout', [UserAuthController::class, 'logout'])->name('logout');
+
+    // ダッシュボード
+    Route::get('/dashboard', function () {
+        $user = Auth::guard('web')->user();
+        return view('tenant.dashboard', [
+            'currentCompany' => $user->company,
+        ]);
+    })->name('dashboard');
+});
+
+
+// 5. 企業別ログイン・パスワード再設定ルート（/{url_code}）
+Route::prefix('{url_code}')->middleware(['tenant'])->group(function () {
+    // 企業ログイン画面（/{url_code} および /{url_code}/login の両方に対応）
+    Route::get('/', [UserAuthController::class, 'showLoginForm'])->name('tenant.entry');
+    Route::post('/', [UserAuthController::class, 'login'])->name('tenant.entry.submit');
+    Route::get('/login', [UserAuthController::class, 'showLoginForm'])->name('tenant.login');
+    Route::post('/login', [UserAuthController::class, 'login'])->name('tenant.login.submit');
+
+    // パスワード再設定（リマインダー）
+    Route::get('/forgot-password', [UserPasswordResetController::class, 'showForgotForm'])->name('tenant.password.forgot');
+    Route::post('/forgot-password', [UserPasswordResetController::class, 'sendResetLink'])->name('tenant.password.email');
+    Route::get('/forgot-password/sent', [UserPasswordResetController::class, 'showSentView'])->name('tenant.password.sent');
+    Route::get('/reset-password', [UserPasswordResetController::class, 'showResetForm'])->name('tenant.password.reset.form');
+    Route::post('/reset-password', [UserPasswordResetController::class, 'resetPassword'])->name('tenant.password.update');
+});

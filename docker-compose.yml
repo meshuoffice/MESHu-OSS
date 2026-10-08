@@ -1,0 +1,70 @@
+# ====================================================================
+# MESHu (Laravel版) Docker Compose 構成定義
+# ====================================================================
+
+services:
+  # 1. Webサーバー (Nginx公式)
+  web:
+    image: nginx:1.25-alpine
+    container_name: meshu-laravel-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    environment:
+      TZ: Asia/Tokyo
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+
+  # 2. PHP実行環境 (AlmaLinux 9 + PHP 8.2 / Composer)
+  app:
+    build: .
+    container_name: meshu-laravel-app
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/php/php.development.ini:/etc/php.d/99-custom.ini:ro
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_NAME:-meshu_db}
+      DB_USERNAME: ${DB_USER:-meshu_user}
+      DB_PASSWORD: ${DB_PASSWORD:-meshu_password_1234}
+      TZ: Asia/Tokyo
+    depends_on:
+      - db
+
+  # 3. データベース環境 (PostgreSQL 16)
+  db:
+    image: postgres:16-alpine
+    container_name: meshu-laravel-db
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER:-meshu_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-meshu_password_1234}
+      POSTGRES_DB: ${DB_NAME:-meshu_db}
+      TZ: Asia/Tokyo
+      PGTZ: Asia/Tokyo
+    command: ["postgres", "-c", "log_timezone=Asia/Tokyo", "-c", "TimeZone=Asia/Tokyo"]
+    volumes:
+      - meshu-laravel-db-data:/var/lib/postgresql/data
+
+  # 4. メールテスト環境 (Mailpit)
+  mail:
+    image: axllent/mailpit:latest
+    container_name: meshu-laravel-mail
+    restart: unless-stopped
+    ports:
+      - "${MAIL_HTTP_PORT:-8025}:8025"  # Web UI
+      - "${MAIL_SMTP_PORT:-1025}:1025"  # SMTP
+    environment:
+      TZ: Asia/Tokyo
+
+volumes:
+  meshu-laravel-db-data:

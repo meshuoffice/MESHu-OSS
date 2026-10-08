@@ -1,0 +1,141 @@
+/*
+ * MESHu システム本体 共通カスタムスタイル (core_custom.css)
+ */
+
+:root {
+    --bs-primary: #4f46e5;
+    --bs-primary-rgb: 79, 70, 229;
+    --bs-primary-bg-subtle: #eef2ff;
+    --bs-primary-border-subtle: #c7d2fe;
+    --bs-primary-text-emphasis: #3730a3;
+    
+    --sidebar-width: 260px;
+    --header-height: 60px;
+}
+
+body {
+    font-family: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+/* ヘッダー */
+.navbar-custom {
+    height: var(--header-height);
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    z-index: 1030;
+}
+
+/* サイドバー */
+.sidebar-custom {
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--header-height));
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    padding: 1.5rem 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+/* メインコンテンツ */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding-top: var(--header-height);
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
+
+/* モバイル表示時の調整 */
+@media (max-width: 991.98px) {
+    .sidebar-custom {
+        left: calc(-1 * var(--sidebar-width));
+    }
+    .sidebar-custom.show {
+        left: 0;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+/* ナビゲーションリンク */
+.nav-link-custom {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: #64748b;
+    font-weight: 500;
+    text-decoration: none;
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.nav-link-custom i {
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+}
+
+.nav-link-custom:hover {
+    color: var(--bs-primary);
+    background-color: #f1f5f9;
+}
+
+.nav-link-custom.active {
+    color: var(--bs-primary);
+    background-color: #eef2ff;
+    border-left-color: var(--bs-primary);
+    font-weight: 600;
+}
+
+/* ロゴ */
+.brand-logo {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: #0f172a;
+    text-decoration: none;
+}
+
+.brand-logo .logo-accent {
+    color: var(--bs-primary);
+}
+
+/* 各種カードなどのコンポーネント微調整 */
+.card-custom {
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border-radius: 8px;
+}
+
+/* テーブル内のドロップダウンメニューがスクロール領域に隠れないように最適化 */
+.table-responsive {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+.dropdown-menu {
+    z-index: 1050;
+}
+
+/* 取引メッセージ・コメント吹き出し */
+.comment-bubble {
+    border-radius: 12px;
+    padding: 1rem;
+    position: relative;
+    text-align: left;
+    word-break: break-word;
+}
+.comment-bubble-mine {
+    background-color: #e7f1ff;
+    border: 1px solid #b6d4fe;
+}
+.comment-bubble-partner {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
