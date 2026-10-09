@@ -325,4 +325,128 @@ class AdminCompanyManagementTest extends TestCase
             'status'     => 'active',
         ]);
     }
+
+    #[Test]
+    public function 審査担当者は企業削除確認画面および削除実行へアクセスできず拒否される()
+    {
+        $unique = uniqid();
+        $company = Company::create([
+            'url_code'         => 'del-target-' . $unique,
+            'name'             => '削除対象株式会社',
+            'abbreviated_name' => '削除対象',
+            'abbreviated_kana' => 'サクジョタイショウ',
+            'corporate_number' => '1234567890123',
+            'tel'              => '03-1111-2222',
+            'zip_code'         => '1000001',
+            'prefecture_code'  => 13,
+            'city'             => '千代田区',
+            'address'          => '1-1',
+            'status'           => 'active',
+        ]);
+
+        $reviewerOwner = Owner::firstOrCreate(
+            ['email' => 'reviewer-staff-test@meshu.org'],
+            [
+                'name'          => '審査スタッフ',
+                'password_hash' => Hash::make('Password123'),
+                'role'          => 'reviewer',
+                'status'        => 'active',
+            ]
+        );
+
+        // 削除確認画面へのアクセス拒否
+        $confirmResponse = $this->actingAs($reviewerOwner, 'admin')
+            ->get(route('admin.corp.delete.confirm', $company->id));
+        $confirmResponse->assertRedirect(route('admin.corp.index'));
+        $confirmResponse->assertSessionHas('error', '企業情報の削除権限がありません。（最高管理者のみ実行可能）');
+
+        // 削除実行へのアクセス拒否
+        $deleteResponse = $this->actingAs($reviewerOwner, 'admin')
+            ->post(route('admin.corp.delete', $company->id), ['status' => 'deleted']);
+        $deleteResponse->assertRedirect(route('admin.corp.index'));
+        $deleteResponse->assertSessionHas('error', '企業情報の削除権限がありません。（最高管理者のみ実行可能）');
+
+        // 企業ステータスが変更されていないこと
+        $company->refresh();
+        $this->assertSame('active', $company->status);
+    }
+
+    #[Test]
+    public function 閲覧専用ユーザーは企業削除確認画面および削除実行へアクセスできず拒否される()
+    {
+        $unique = uniqid();
+        $company = Company::create([
+            'url_code'         => 'del-target-v-' . $unique,
+            'name'             => '閲覧テスト対象株式会社',
+            'abbreviated_name' => '閲覧対象',
+            'abbreviated_kana' => 'エツランタイショウ',
+            'corporate_number' => '1234567890999',
+            'tel'              => '03-9999-0000',
+            'zip_code'         => '1000001',
+            'prefecture_code'  => 13,
+            'city'             => '千代田区',
+            'address'          => '1-1',
+            'status'           => 'active',
+        ]);
+
+        $viewerOwner = Owner::firstOrCreate(
+            ['email' => 'viewer-staff-test@meshu.org'],
+            [
+                'name'          => '閲覧スタッフ',
+                'password_hash' => Hash::make('Password123'),
+                'role'          => 'viewer',
+                'status'        => 'active',
+            ]
+        );
+
+        // 削除確認画面へのアクセス拒否
+        $confirmResponse = $this->actingAs($viewerOwner, 'admin')
+            ->get(route('admin.corp.delete.confirm', $company->id));
+        $confirmResponse->assertRedirect(route('admin.corp.index'));
+        $confirmResponse->assertSessionHas('error', '企業情報の削除権限がありません。（最高管理者のみ実行可能）');
+
+        // 削除実行へのアクセス拒否
+        $deleteResponse = $this->actingAs($viewerOwner, 'admin')
+            ->post(route('admin.corp.delete', $company->id), ['status' => 'deleted']);
+        $deleteResponse->assertRedirect(route('admin.corp.index'));
+        $deleteResponse->assertSessionHas('error', '企業情報の削除権限がありません。（最高管理者のみ実行可能）');
+
+        // 企業ステータスが変更されていないこと
+        $company->refresh();
+        $this->assertSame('active', $company->status);
+    }
+
+    #[Test]
+    public function 最高管理者は企業削除確認画面へアクセスできステータスを変更できる()
+    {
+        $unique = uniqid();
+        $company = Company::create([
+            'url_code'         => 'del-target-adm-' . $unique,
+            'name'             => '管理者削除対象株式会社',
+            'abbreviated_name' => '管理削除',
+            'abbreviated_kana' => 'カンリサクジョ',
+            'corporate_number' => '1234567890888',
+            'tel'              => '03-8888-0000',
+            'zip_code'         => '1000001',
+            'prefecture_code'  => 13,
+            'city'             => '千代田区',
+            'address'          => '1-1',
+            'status'           => 'active',
+        ]);
+
+        // 削除確認画面へのアクセス成功
+        $confirmResponse = $this->actingAs($this->adminOwner, 'admin')
+            ->get(route('admin.corp.delete.confirm', $company->id));
+        $confirmResponse->assertStatus(200);
+        $confirmResponse->assertSee('管理者削除対象株式会社');
+
+        // 停止ステータスへの変更成功
+        $suspendResponse = $this->actingAs($this->adminOwner, 'admin')
+            ->post(route('admin.corp.delete', $company->id), ['status' => 'suspended']);
+        $suspendResponse->assertRedirect(route('admin.corp.show', ['id' => $company->id]));
+        $suspendResponse->assertSessionHas('success');
+
+        $company->refresh();
+        $this->assertSame('suspended', $company->status);
+    }
 }
