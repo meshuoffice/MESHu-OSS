@@ -1,0 +1,81 @@
+name: Tests
+
+on:
+  push:
+    branches: [ "main", "develop", "feature/*", "fix/*" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  laravel-tests:
+    name: PHP 8.2 + PostgreSQL 16 Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: meshu_testing
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_pgsql, pgsql, bcmath, json, fileinfo
+          coverage: none
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v3
+        with:
+          path: src/vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('src/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install Composer dependencies
+        working-directory: src
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Prepare Testing Environment
+        working-directory: src
+        env:
+          APP_ENV: testing
+          APP_KEY: base64:8mP9+0K9/b8k7w3E2wX5mY9+8K0b6L8vP3wX5mY9+8K=
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: meshu_testing
+          DB_USERNAME: postgres
+          DB_PASSWORD: password
+          ADMIN_URL_PATH: admin
+        run: |
+          php artisan config:clear
+          php artisan migrate --force
+
+      - name: Run Tests
+        working-directory: src
+        env:
+          APP_ENV: testing
+          APP_KEY: base64:8mP9+0K9/b8k7w3E2wX5mY9+8K0b6L8vP3wX5mY9+8K=
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: meshu_testing
+          DB_USERNAME: postgres
+          DB_PASSWORD: password
+          ADMIN_URL_PATH: admin
+        run: php artisan test

@@ -18,12 +18,23 @@ use Illuminate\View\View;
 class AdminCompanyController extends Controller
 {
     /**
-     * 事務局管理者の書込権限チェック（viewerは閲覧のみ）
+     * 事務局管理者の書込権限チェック（viewerは閲覧のみ、admin以外は削除不可）
      */
-    private function checkCompanyWriteAccess(): ?RedirectResponse
+    private function checkCompanyWriteAccess(bool $isDelete = false): ?RedirectResponse
     {
         $currentOwner = Auth::guard('admin')->user();
-        if ($currentOwner && $currentOwner->role === 'viewer') {
+        if (!$currentOwner) {
+            return redirect()->route('admin.login');
+        }
+
+        if ($isDelete) {
+            if ($currentOwner->role !== 'admin') {
+                return redirect()->route('admin.corp.index')->with('error', '企業情報の削除権限がありません。（最高管理者のみ実行可能）');
+            }
+            return null;
+        }
+
+        if ($currentOwner->role === 'viewer') {
             return redirect()->route('admin.corp.index')->with('error', '閲覧専用アカウントのため、登録・更新・削除権限がありません。');
         }
         return null;
@@ -354,7 +365,7 @@ class AdminCompanyController extends Controller
      */
     public function deleteConfirm(Request $request, int|string $id): View|RedirectResponse
     {
-        if ($redirect = $this->checkCompanyWriteAccess()) {
+        if ($redirect = $this->checkCompanyWriteAccess(true)) {
             return $redirect;
         }
 
@@ -375,7 +386,7 @@ class AdminCompanyController extends Controller
      */
     public function delete(Request $request, int|string $id): RedirectResponse
     {
-        if ($redirect = $this->checkCompanyWriteAccess()) {
+        if ($redirect = $this->checkCompanyWriteAccess(true)) {
             return $redirect;
         }
 
