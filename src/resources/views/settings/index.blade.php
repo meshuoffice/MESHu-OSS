@@ -79,7 +79,7 @@
     <div class="row g-4">
         <!-- 企業情報メンテナンス -->
         <div class="col-12 col-md-6 col-xl-4">
-            <a href="{{ url('/company') }}" class="card setting-card bg-white p-4">
+            <a href="{{ route('tenant.company.edit', ['url_code' => $currentCompany->url_code]) }}" class="card setting-card bg-white p-4">
                 <div class="d-flex align-items-start gap-3 mb-3">
                     <div class="setting-icon-bg bg-primary-subtle text-primary">
                         <i class="bi bi-building-fill"></i>

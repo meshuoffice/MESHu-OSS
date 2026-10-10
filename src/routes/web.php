@@ -43,6 +43,24 @@ Route::middleware(['auth:web'])->group(function () {
     // 各種設定ポータル（管理者のみ）
     Route::get('/settings', [\App\Http\Controllers\Tenant\SettingsController::class, 'index'])->name('tenant.settings');
 
+    // 自社企業情報メンテナンス（/{url_code}/settings/company）
+    Route::prefix('{url_code}/settings/company')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\CompanyController::class, 'edit'])->name('tenant.company.edit');
+        Route::post('/confirm', [\App\Http\Controllers\Tenant\CompanyController::class, 'confirm'])->name('tenant.company.confirm');
+        Route::post('/update', [\App\Http\Controllers\Tenant\CompanyController::class, 'update'])->name('tenant.company.update');
+        Route::get('/complete', [\App\Http\Controllers\Tenant\CompanyController::class, 'complete'])->name('tenant.company.complete');
+    });
+
+    // ショートカット・CI4互換リダイレクト
+    Route::get('/settings/company', function () {
+        $user = Auth::guard('web')->user();
+        return redirect()->route('tenant.company.edit', ['url_code' => $user->company->url_code]);
+    });
+    Route::get('/company', function () {
+        $user = Auth::guard('web')->user();
+        return redirect()->route('tenant.company.edit', ['url_code' => $user->company->url_code]);
+    });
+
     // マイプロフィール
     Route::prefix('profile')->group(function () {
         Route::get('/', [\App\Http\Controllers\Tenant\ProfileController::class, 'edit'])->name('tenant.profile');
