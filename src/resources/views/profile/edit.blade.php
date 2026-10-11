@@ -3,17 +3,20 @@
 @section('title', 'マイプロフィール編集 | MESHu')
 
 @section('content')
-<div class="mx-auto" style="max-width: 900px;">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-2">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
-            <li class="breadcrumb-item active">マイプロフィール編集</li>
-        </ol>
-    </nav>
+<!-- パンくずリスト & ページタイトル -->
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
+                <li class="breadcrumb-item active" aria-current="page">マイプロフィール</li>
+            </ol>
+        </nav>
+        <h1 class="h3 m-0 fw-bold">マイプロフィール</h1>
+    </div>
+</div>
 
-    <h1 class="h3 fw-bold mb-4">マイプロフィール</h1>
-
-    <form action="{{ route('tenant.profile.confirm') }}" method="POST" novalidate class="card card-custom bg-white p-4">
+<form action="{{ route('tenant.profile.confirm') }}" method="POST" novalidate class="card card-custom bg-white p-4">
         @csrf
 
         <h5 class="fw-bold mb-3 border-bottom pb-2 text-primary">アカウント・パスワード設定</h5>
@@ -59,8 +62,8 @@
                 @enderror
             </div>
             <div class="col-md-6">
-                <label class="form-label fw-semibold">名前カナ <small class="text-muted">（全角カナ）</small></label>
-                <input type="text" class="form-control @error('user_name_kana') is-invalid @enderror" name="user_name_kana" value="{{ old('user_name_kana', $user->user_name_kana ?? '') }}" placeholder="ヤマダ タロウ">
+                <label class="form-label fw-semibold">名前カナ <span class="badge bg-danger">必須</span> <small class="text-muted">（全角カナ）</small></label>
+                <input type="text" class="form-control @error('user_name_kana') is-invalid @enderror" name="user_name_kana" value="{{ old('user_name_kana', $user->user_name_kana ?? '') }}" placeholder="ヤマダ タロウ" required>
                 @error('user_name_kana')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -121,5 +124,4 @@
             <button type="submit" class="btn btn-primary px-4">確認画面へ進む <i class="bi bi-arrow-right ms-1"></i></button>
         </div>
     </form>
-</div>
 @endsection

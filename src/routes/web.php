@@ -51,7 +51,29 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/complete', [\App\Http\Controllers\Tenant\CompanyController::class, 'complete'])->name('tenant.company.complete');
     });
 
-    // ショートカット・CI4互換リダイレクト
+    // 自社従業員管理（mshdev 準拠: /users）
+    Route::prefix('users')->name('tenant.users.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\UserController::class, 'index'])->name('index');
+        Route::get('/new', [\App\Http\Controllers\Tenant\UserController::class, 'create'])->name('create');
+        Route::post('/confirm-create', [\App\Http\Controllers\Tenant\UserController::class, 'confirmCreate'])->name('confirm_create');
+        Route::post('/create', [\App\Http\Controllers\Tenant\UserController::class, 'store'])->name('store');
+        Route::get('/complete', [\App\Http\Controllers\Tenant\UserController::class, 'complete'])->name('complete');
+
+        Route::get('/show/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'show'])->name('show');
+        Route::get('/edit/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'edit'])->name('edit');
+        Route::post('/confirm-update/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'confirmUpdate'])->name('confirm_update');
+        Route::post('/update/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'update'])->name('update');
+        Route::post('/assign-links/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'assignLinks'])->name('assign_links');
+
+        Route::get('/password/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'passwordEdit'])->name('password_edit');
+        Route::post('/confirm-password/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'confirmPassword'])->name('confirm_password');
+        Route::post('/send-password/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'sendPassword'])->name('send_password');
+
+        Route::get('/delete-confirm/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'confirmDelete'])->name('delete_confirm');
+        Route::post('/delete/{user}', [\App\Http\Controllers\Tenant\UserController::class, 'destroy'])->name('destroy');
+    });
+
+
     Route::get('/settings/company', function () {
         $user = Auth::guard('web')->user();
         return redirect()->route('tenant.company.edit', ['url_code' => $user->company->url_code]);
@@ -80,7 +102,7 @@ Route::middleware(['auth:web'])->group(function () {
 
 
 // グローバルURLパラメータ制約（システム予約ルートや事務局ルートとの競合回避）
-Route::pattern('url_code', '^(?!(signup|dashboard|settings|profile|contact|logout|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
+Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|profile|contact|logout|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
 
 // 5. 企業別ログイン・パスワード再設定ルート（/{url_code}）
 Route::prefix('{url_code}')->middleware(['tenant'])->group(function () {

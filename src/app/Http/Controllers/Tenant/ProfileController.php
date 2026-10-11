@@ -69,9 +69,9 @@ class ProfileController extends Controller
         }
 
         $rules = [
-            'email'          => ['required', 'string', 'email', 'max:255', "unique:users,email,{$user->id}"],
+            'email'          => ['required', 'string', 'email:filter', 'max:255', "unique:users,email,{$user->id}"],
             'user_name'      => ['required', 'string', 'max:100'],
-            'user_name_kana' => ['nullable', 'string', 'regex:/^[ァ-ヶー\s]+$/u'],
+            'user_name_kana' => ['required', 'string', 'regex:/^[ァ-ヶー\s]+$/u'],
             'department'     => ['nullable', 'string', 'max:100'],
             'position'       => ['nullable', 'string', 'max:100'],
         ];
@@ -81,6 +81,7 @@ class ProfileController extends Controller
             'email.email'             => '有効なメールアドレス形式で入力してください。',
             'email.unique'            => '入力されたメールアドレスは既に使用されています。',
             'user_name.required'      => '名前は必須項目です。',
+            'user_name_kana.required' => '名前カナは必須項目です。',
             'user_name_kana.regex'    => '名前カナは全角カタカナで入力してください。',
         ];
 

@@ -33,7 +33,7 @@ class UserAuthController extends Controller
     public function login(Request $request, string $url_code): RedirectResponse
     {
         $request->validate([
-            'email'    => ['required', 'string', 'email'],
+            'email'    => ['required', 'string', 'email:filter'],
             'password' => ['required', 'string'],
         ], [
             'email.required'    => 'メールアドレスを入力してください。',

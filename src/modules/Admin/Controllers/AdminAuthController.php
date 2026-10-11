@@ -32,7 +32,7 @@ class AdminAuthController extends Controller
     public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'email'    => ['required', 'string', 'email'],
+            'email'    => ['required', 'string', 'email:filter'],
             'password' => ['required', 'string'],
         ], [
             'email.required'    => 'メールアドレスを入力してください。',

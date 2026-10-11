@@ -101,7 +101,7 @@
 
         <!-- 従業員管理（自社ユーザー管理） -->
         <div class="col-12 col-md-6 col-xl-4">
-            <a href="{{ url('/users') }}" class="card setting-card bg-white p-4">
+            <a href="{{ route('tenant.users.index') }}" class="card setting-card bg-white p-4">
                 <div class="d-flex align-items-start gap-3 mb-3">
                     <div class="setting-icon-bg bg-info-subtle text-info-emphasis">
                         <i class="bi bi-people-fill"></i>

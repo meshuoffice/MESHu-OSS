@@ -31,7 +31,7 @@ class UserPasswordResetController extends Controller
     public function sendResetLink(Request $request, string $url_code): RedirectResponse
     {
         $request->validate([
-            'email' => ['required', 'string', 'email'],
+            'email' => ['required', 'string', 'email:filter'],
         ], [
             'email.required' => 'メールアドレスを入力してください。',
             'email.email'    => '有効なメールアドレス形式で入力してください。',

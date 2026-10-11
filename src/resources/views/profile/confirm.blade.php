@@ -3,10 +3,21 @@
 @section('title', 'マイプロフィール確認 | MESHu')
 
 @section('content')
-<div class="mx-auto" style="max-width: 800px;">
-    <h1 class="h3 fw-bold mb-4">更新内容の確認</h1>
+<!-- パンくずリスト & ページタイトル -->
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.profile') }}" class="text-decoration-none">マイプロフィール</a></li>
+                <li class="breadcrumb-item active" aria-current="page">更新内容の確認</li>
+            </ol>
+        </nav>
+        <h1 class="h3 m-0 fw-bold">更新内容の確認</h1>
+    </div>
+</div>
 
-    <form action="{{ route('tenant.profile.update') }}" method="POST" class="card card-custom bg-white p-4">
+<form action="{{ route('tenant.profile.update') }}" method="POST" class="card card-custom bg-white p-4">
         @csrf
 
         <input type="hidden" name="email" value="{{ $postData['email'] }}">
@@ -61,5 +72,4 @@
             <button type="submit" class="btn btn-success px-4">この内容で更新する <i class="bi bi-check-lg ms-1"></i></button>
         </div>
     </form>
-</div>
 @endsection

@@ -71,7 +71,7 @@ class SignupController extends Controller
             'address'          => ['required', 'string', 'max:255'],
             'adminName'        => ['required', 'string', 'max:100'],
             'adminNameKana'    => ['required', 'string', 'max:100', 'regex:/^[ァ-ヶー\s　]+$/u'],
-            'adminEmail'       => ['required', 'string', 'email', 'max:255'],
+            'adminEmail'       => ['required', 'string', 'email:filter', 'max:255'],
             'department'       => ['nullable', 'string', 'max:100'],
             'position'         => ['nullable', 'string', 'max:100'],
             'agreeTerms'       => ['required'],

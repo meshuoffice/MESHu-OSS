@@ -61,10 +61,10 @@ class SettingsTest extends TestCase
     }
 
     /**
-     * 一般社員（role=staff）は各種設定ポータル（/settings）にアクセスできず403またはリダイレクトされること
+     * 一般社員（role=staff）が各種設定ポータル（/settings）にアクセスした場合はダッシュボードにリダイレクトされ、エラーメッセージが表示されること
      */
     #[Test]
-    public function 一般社員は設定ポータルにアクセスできない()
+    public function 一般社員が設定ポータルにアクセスした場合はダッシュボードへリダイレクトされる()
     {
         $staffUser = User::create([
             'company_id'      => $this->company->id,
@@ -81,6 +81,7 @@ class SettingsTest extends TestCase
 
         $response = $this->actingAs($staffUser, 'web')->get('/settings');
 
-        $response->assertStatus(403);
+        $response->assertRedirect('/dashboard');
+        $response->assertSessionHas('error', 'このページへアクセスする権限がありません。（管理者専用機能）');
     }
 }
