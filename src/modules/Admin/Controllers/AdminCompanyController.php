@@ -195,7 +195,7 @@ class AdminCompanyController extends Controller
 
         if (!$isEdit) {
             $rules['user_name'] = ['required', 'string', 'max:100'];
-            $rules['email']     = ['required', 'string', 'email', 'max:255'];
+            $rules['email']     = ['required', 'string', 'email:filter', 'max:255'];
             $rules['password']  = ['required', 'string', 'min:8'];
 
             $messages['user_name.required'] = '初期管理者名は必須項目です。';

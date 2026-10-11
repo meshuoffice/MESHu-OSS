@@ -115,7 +115,7 @@ class AdminOwnerController extends Controller
             'email' => [
                 'required',
                 'string',
-                'email',
+                'email:filter',
                 'max:255',
                 $isEdit ? Rule::unique('owners', 'email')->ignore($ownerId) : Rule::unique('owners', 'email'),
             ],
@@ -170,7 +170,7 @@ class AdminOwnerController extends Controller
 
         $rules = [
             'name'     => ['required', 'string', 'min:2', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', Rule::unique('owners', 'email')],
+            'email'    => ['required', 'string', 'email:filter', 'max:255', Rule::unique('owners', 'email')],
             'role'     => ['required', Rule::in(['admin', 'reviewer', 'viewer'])],
             'password' => ['required', 'string', 'min:8'],
         ];
@@ -271,7 +271,7 @@ class AdminOwnerController extends Controller
 
         $rules = [
             'name'  => ['required', 'string', 'min:2', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('owners', 'email')->ignore($id)],
+            'email' => ['required', 'string', 'email:filter', 'max:255', Rule::unique('owners', 'email')->ignore($id)],
             'role'  => ['required', Rule::in(['admin', 'reviewer', 'viewer'])],
         ];
 

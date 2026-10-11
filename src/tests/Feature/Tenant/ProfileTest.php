@@ -72,10 +72,19 @@ class ProfileTest extends TestCase
     {
         // 1. 名前が未入力の場合
         $response = $this->actingAs($this->user, 'web')->post('/profile/confirm', [
-            'user_name' => '',
-            'email'     => 'test@example.com',
+            'user_name'      => '',
+            'user_name_kana' => 'ヤマダ タロウ',
+            'email'          => 'test@example.com',
         ]);
         $response->assertSessionHasErrors('user_name');
+
+        // 1-2. 名前カナが未入力の場合
+        $response = $this->actingAs($this->user, 'web')->post('/profile/confirm', [
+            'user_name'      => '山田 太郎',
+            'user_name_kana' => '',
+            'email'          => 'test@example.com',
+        ]);
+        $response->assertSessionHasErrors('user_name_kana');
 
         // 2. カナに漢字が含まれる場合
         $response = $this->actingAs($this->user, 'web')->post('/profile/confirm', [
@@ -88,6 +97,7 @@ class ProfileTest extends TestCase
         // 3. 現在のパスワードが間違っている場合
         $response = $this->actingAs($this->user, 'web')->post('/profile/confirm', [
             'user_name'        => '山田 太郎',
+            'user_name_kana'   => 'ヤマダ タロウ',
             'email'            => 'test@example.com',
             'current_password' => 'WrongPassword',
             'password'         => 'NewPassword123',
