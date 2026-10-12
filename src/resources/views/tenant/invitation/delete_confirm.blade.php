@@ -3,18 +3,16 @@
 @section('title', '招待削除の確認 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4" style="max-width: 800px;">
-
-    <!-- パンくずリスト -->
-    <div class="mb-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
-                <li class="breadcrumb-item"><a href="{{ url('/settings') }}">各種設定</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('tenant.invitation.index') }}">招待先管理</a></li>
-                <li class="breadcrumb-item active">招待削除の確認</li>
-            </ol>
-        </nav>
+<!-- パンくずリスト -->
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('tenant.invitation.index') }}">招待先管理</a></li>
+            <li class="breadcrumb-item active">招待削除の確認</li>
+        </ol>
+    </nav>
         <h1 class="h3 m-0 fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>招待レコードの削除確認</h1>
         <p class="text-muted small mt-1">以下の招待情報を削除します。内容を確認の上、削除を実行してください。</p>
     </div>
@@ -76,6 +74,4 @@
             </button>
         </div>
     </form>
-
-</div>
 @endsection

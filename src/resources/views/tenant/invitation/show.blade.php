@@ -3,21 +3,19 @@
 @section('title', '招待詳細閲覧 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4">
-
-    <!-- パンくずリスト & 戻るボタン -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url('/settings') }}">各種設定</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('tenant.invitation.index') }}">招待先管理</a></li>
-                    <li class="breadcrumb-item active">招待詳細閲覧</li>
-                </ol>
-            </nav>
-            <h1 class="h3 m-0 fw-bold">招待詳細の閲覧</h1>
-        </div>
+<!-- パンくずリスト & 戻るボタン -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.invitation.index') }}">招待先管理</a></li>
+                <li class="breadcrumb-item active">招待詳細閲覧</li>
+            </ol>
+        </nav>
+        <h1 class="h3 m-0 fw-bold">招待詳細の閲覧</h1>
+    </div>
         <div class="d-flex gap-2">
             <a href="{{ route('tenant.invitation.index') }}" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1">
                 <i class="bi bi-arrow-left"></i> 一覧へ戻る
@@ -112,6 +110,4 @@
             </div>
         </div>
     </div>
-
-</div>
 @endsection

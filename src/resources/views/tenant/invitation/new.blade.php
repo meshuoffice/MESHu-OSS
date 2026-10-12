@@ -3,21 +3,19 @@
 @section('title', '招待メール作成 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4">
-
-    <!-- パンくずリスト & 戻るボタン -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url('/settings') }}">各種設定</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('tenant.invitation.index') }}">招待先管理</a></li>
-                    <li class="breadcrumb-item active">招待メール作成</li>
-                </ol>
-            </nav>
-            <h1 class="h3 m-0 fw-bold">未登録企業の招待メール作成</h1>
-        </div>
+<!-- パンくずリスト & 戻るボタン -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.invitation.index') }}">招待先管理</a></li>
+                <li class="breadcrumb-item active">招待メール作成</li>
+            </ol>
+        </nav>
+        <h1 class="h3 m-0 fw-bold">未登録企業の招待メール作成</h1>
+    </div>
         <div>
             <a href="{{ route('tenant.invitation.index') }}" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2">
                 <i class="bi bi-arrow-left"></i>
@@ -122,6 +120,4 @@
             </form>
         </div>
     </div>
-
-</div>
 @endsection

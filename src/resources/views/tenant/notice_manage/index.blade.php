@@ -3,46 +3,29 @@
 @section('title', 'お知らせ配信管理 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4">
-
-    <!-- パンくずリスト & ページタイトル -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url('/settings') }}" class="text-decoration-none">各種設定</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">お知らせ配信管理</li>
-                </ol>
-            </nav>
-            <h1 class="h3 m-0 fw-bold">お知らせ配信管理</h1>
-        </div>
-        <div class="d-flex gap-2 mt-2 mt-sm-0">
-            <a href="{{ route('tenant.notice.manage.new') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
-                <i class="bi bi-plus-lg"></i>
-                <span>新規お知らせ作成</span>
-            </a>
-        </div>
+<!-- パンくずリスト & ページタイトル -->
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
+                <li class="breadcrumb-item active" aria-current="page">お知らせ配信管理</li>
+            </ol>
+        </nav>
+        <h1 class="h3 m-0 fw-bold">お知らせ配信管理</h1>
     </div>
+    <div class="d-flex gap-2 mt-2 mt-sm-0">
+        <a href="{{ route('tenant.notice.manage.new') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
+            <i class="bi bi-plus-lg"></i>
+            <span>新規お知らせ作成</span>
+        </a>
+    </div>
+</div>
 
-    <!-- フラッシュメッセージ -->
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
-            <i class="bi bi-exclamation-octagon-fill me-2"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <!-- アナウンスバナー（配信仕様の明記） -->
-    <div class="alert alert-info d-flex align-items-center gap-3 mb-4 border-0 shadow-sm" role="alert">
-        <i class="bi bi-info-circle-fill fs-4 flex-shrink-0 text-primary"></i>
+<!-- アナウンスバナー（配信仕様の明記） -->
+<div class="alert alert-info d-flex align-items-center gap-3 mb-4 border-0 shadow-sm" role="alert">
+    <i class="bi bi-info-circle-fill fs-4 flex-shrink-0 text-primary"></i>
         <div class="small">
             自社が発信したお知らせは、<strong>「つながり（MESHu）」で連携が承認されている取引先企業の全ユーザー</strong>のダッシュボードおよびお知らせ一覧に配信されます。
         </div>
@@ -154,6 +137,4 @@
             @endif
         </div>
     </div>
-
-</div>
 @endsection

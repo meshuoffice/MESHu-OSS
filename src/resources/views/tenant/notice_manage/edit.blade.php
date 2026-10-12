@@ -3,23 +3,21 @@
 @section('title', 'お知らせ編集 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4">
-
-    <!-- パンくずリスト & ページタイトル -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url('/settings') }}" class="text-decoration-none">各種設定</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('tenant.notice.manage.index') }}" class="text-decoration-none">お知らせ配信管理</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('tenant.notice.manage.show', $notice->id) }}" class="text-decoration-none">詳細</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">編集</li>
-                </ol>
-            </nav>
-            <h1 class="h3 m-0 fw-bold">お知らせ編集</h1>
-        </div>
+<!-- パンくずリスト & ページタイトル -->
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.notice.manage.index') }}" class="text-decoration-none">お知らせ配信管理</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.notice.manage.show', $notice->id) }}" class="text-decoration-none">詳細</a></li>
+                <li class="breadcrumb-item active" aria-current="page">編集</li>
+            </ol>
+        </nav>
+        <h1 class="h3 m-0 fw-bold">お知らせ編集</h1>
     </div>
+</div>
 
     <!-- エラー表示 -->
     @if ($errors->any())
@@ -116,6 +114,4 @@
             </form>
         </div>
     </div>
-
-</div>
 @endsection

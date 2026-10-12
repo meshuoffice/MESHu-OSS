@@ -3,10 +3,8 @@
 @section('title', 'お知らせ登録完了 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4">
-
-    <!-- 完了カード -->
-    <div class="card card-custom bg-white mx-auto border-0 shadow-sm mt-4 text-center p-5" style="max-width: 680px;">
+<!-- 完了カード -->
+<div class="card card-custom bg-white mx-auto border-0 shadow-sm mt-4 text-center p-5" style="max-width: 680px;">
         <div class="card-body">
             <div class="mb-4">
                 <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
@@ -36,6 +34,4 @@
             </div>
         </div>
     </div>
-
-</div>
 @endsection

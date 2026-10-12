@@ -3,21 +3,19 @@
 @section('title', 'お知らせ詳細 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4">
-
-    <!-- パンくずリスト & ページタイトル -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url('/settings') }}" class="text-decoration-none">各種設定</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('tenant.notice.manage.index') }}" class="text-decoration-none">お知らせ配信管理</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">お知らせ詳細</li>
-                </ol>
-            </nav>
-            <h1 class="h3 m-0 fw-bold">お知らせ詳細</h1>
-        </div>
+<!-- パンくずリスト & ページタイトル -->
+<div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.notice.manage.index') }}" class="text-decoration-none">お知らせ配信管理</a></li>
+                <li class="breadcrumb-item active" aria-current="page">お知らせ詳細</li>
+            </ol>
+        </nav>
+        <h1 class="h3 m-0 fw-bold">お知らせ詳細</h1>
+    </div>
         <div class="d-flex gap-2 mt-2 mt-sm-0">
             <a href="{{ route('tenant.notice.manage.edit', $notice->id) }}" class="btn btn-dark btn-sm d-flex align-items-center gap-1 shadow-sm">
                 <i class="bi bi-pencil"></i>
@@ -118,6 +116,4 @@
 
         </div>
     </div>
-
-</div>
 @endsection

@@ -3,18 +3,16 @@
 @section('title', '招待内容の確認 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4">
-
-    <!-- パンくずリスト -->
-    <div class="mb-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
-                <li class="breadcrumb-item"><a href="{{ url('/settings') }}">各種設定</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('tenant.invitation.index') }}">招待先管理</a></li>
-                <li class="breadcrumb-item active">招待内容の確認</li>
-            </ol>
-        </nav>
+<!-- パンくずリスト -->
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('tenant.invitation.index') }}">招待先管理</a></li>
+            <li class="breadcrumb-item active">招待内容の確認</li>
+        </ol>
+    </nav>
         <h1 class="h3 m-0 fw-bold">招待送信内容の確認</h1>
         <p class="text-muted small mt-1">以下の内容で招待メールを送信します。内容をご確認の上、「招待メールを送信する」をクリックしてください。</p>
     </div>
@@ -98,6 +96,4 @@
             </button>
         </div>
     </form>
-
-</div>
 @endsection

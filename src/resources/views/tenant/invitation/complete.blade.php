@@ -3,11 +3,9 @@
 @section('title', '招待完了 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4" style="max-width: 700px;">
-
-    <!-- 完了カード -->
-    <div class="card border-0 shadow-sm text-center p-5 my-5">
-        <div class="mb-4">
+<!-- 完了カード -->
+<div class="card border-0 shadow-sm text-center p-5 my-5 mx-auto" style="max-width: 700px;">
+    <div class="mb-4">
             <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
                 <i class="bi bi-check-lg fs-1"></i>
             </div>
@@ -47,6 +45,4 @@
             </a>
         </div>
     </div>
-
-</div>
 @endsection

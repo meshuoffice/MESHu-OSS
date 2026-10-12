@@ -3,46 +3,30 @@
 @section('title', '招待先管理 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4">
-
-    <!-- パンくずリスト & ページタイトル -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url('/settings') }}">各種設定</a></li>
-                    <li class="breadcrumb-item active">招待先管理</li>
-                </ol>
-            </nav>
-            <h1 class="h3 m-0 fw-bold">招待先管理</h1>
-        </div>
-        <div>
-            <a href="{{ route('tenant.invitation.new') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 shadow-sm">
-                <i class="bi bi-send-plus-fill"></i>
-                <span>新規招待メール作成</span>
-            </a>
-        </div>
+<!-- パンくずリスト & ページタイトル -->
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">ホーム</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
+                <li class="breadcrumb-item active">招待先管理</li>
+            </ol>
+        </nav>
+        <h1 class="h3 m-0 fw-bold">招待先管理</h1>
     </div>
+    <div>
+        <a href="{{ route('tenant.invitation.new') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 shadow-sm">
+            <i class="bi bi-send-plus-fill"></i>
+            <span>新規招待メール作成</span>
+        </a>
+    </div>
+</div>
 
-    <!-- アラートメッセージ -->
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <!-- アラート案内 -->
-    <div class="alert alert-info border-0 shadow-sm d-flex align-items-start gap-3 mb-4">
-        <i class="bi bi-info-circle-fill text-info fs-5 flex-shrink-0 mt-1"></i>
-        <div class="small">
+<!-- アラート案内 -->
+<div class="alert alert-info border-0 shadow-sm d-flex align-items-start gap-3 mb-4">
+    <i class="bi bi-info-circle-fill text-info fs-5 flex-shrink-0 mt-1"></i>
+    <div class="small">
             招待した相手企業がメール内の専用URLから登録を完了すると、<strong>自動的につながり（取引先）が生成</strong>され、本一覧から除外されます。<br>
             招待送信後に一定期間登録がない場合などは、詳細画面または一覧の削除ボタンより招待レコードの削除（物理削除）が可能です。
         </div>
@@ -158,6 +142,4 @@
             </div>
         @endif
     </div>
-
-</div>
 @endsection
