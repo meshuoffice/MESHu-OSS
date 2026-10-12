@@ -64,10 +64,10 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-1">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
-                <li class="breadcrumb-item active" aria-current="page">各種設定ポータル</li>
+                <li class="breadcrumb-item active" aria-current="page">各種設定</li>
             </ol>
         </nav>
-        <h1 class="h3 m-0 fw-bold">各種設定ポータル</h1>
+        <h1 class="h3 m-0 fw-bold">各種設定</h1>
     </div>
 </div>
 
