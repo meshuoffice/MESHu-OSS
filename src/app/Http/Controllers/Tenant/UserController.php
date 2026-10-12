@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
+use App\Mail\UserInitialPasswordMail;
+use App\Mail\UserResetPasswordMail;
 use App\Models\Company;
 use App\Models\CompanyLink;
 use App\Models\User;
@@ -12,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -190,12 +193,13 @@ class UserController extends Controller
         $user->save();
 
         // 初期パスワード通知メール
-        $this->sendNotificationEmail(
-            $user->email,
-            '【MESHu】アカウント登録と初期パスワードのお知らせ',
-            "{$user->user_name} 様\n\nMESHu のアカウント登録が完了いたしました。\n以下の初期仮パスワードにてログインし、マイプロフィールよりパスワード変更を行ってください。\n\n■ ログイン情報\n・ログインID: {$user->email}\n・初期仮パスワード: {$generatedPassword}\n\n----------------------------------------\nMESHu プラットフォーム"
-        );
-
+        try {
+            Mail::to($user->email)->send(
+                new UserInitialPasswordMail($user, $generatedPassword)
+            );
+        } catch (\Throwable $e) {
+            Log::error('初期パスワード通知メール送信エラー: ' . $e->getMessage());
+        }
         $flashMessage = "登録完了：{$user->user_name} 様宛（{$user->email}）に初期仮パスワード通知メールを送信いたしました。[ 初期仮パスワード: {$generatedPassword} ]";
 
         return redirect()->route('tenant.users.complete')
@@ -447,12 +451,13 @@ class UserController extends Controller
         $targetUser->password_hash = Hash::make($newTempPassword);
         $targetUser->save();
 
-        $this->sendNotificationEmail(
-            $validated['email'],
-            '【MESHu】仮パスワード再発行のお知らせ',
-            "{$targetUser->user_name} 様\n\n仮パスワードの再発行手続きが完了いたしました。\n\n■ 仮ログイン情報\n・ログインID: {$targetUser->email}\n・仮パスワード: {$newTempPassword}\n\nログイン後、マイプロフィール画面より新しいパスワードへの変更をお願いいたします。\n\n----------------------------------------\nMESHu プラットフォーム"
-        );
-
+        try {
+            Mail::to($validated['email'])->send(
+                new UserResetPasswordMail($targetUser, $newTempPassword)
+            );
+        } catch (\Throwable $e) {
+            Log::error('仮パスワード通知メール送信エラー: ' . $e->getMessage());
+        }
         return view('settings.users.password_complete', [
             'activeMenu'     => 'settings',
             'currentCompany' => $company,
@@ -516,19 +521,4 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * メール送信処理
-     */
-    private function sendNotificationEmail(string $toEmail, string $subject, string $body): bool
-    {
-        try {
-            Mail::raw($body, function ($message) use ($toEmail, $subject) {
-                $message->to($toEmail)->subject($subject);
-            });
-            return true;
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('従業員通知メール送信エラー: ' . $e->getMessage());
-            return false;
-        }
-    }
 }

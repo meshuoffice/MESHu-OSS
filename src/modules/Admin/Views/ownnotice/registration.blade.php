@@ -2,6 +2,23 @@
 
 @section('content')
 
+@php
+    $formData = $formData ?? [];
+
+    if (!empty($formData['published_at'])) {
+        $regPublishedAt = date('Y-m-d\TH:i', strtotime($formData['published_at']));
+    } else {
+        $regPublishedAt = now()->format('Y-m-d\TH:i');
+    }
+
+    $regCategory    = $formData['category'] ?? 'info';
+    $regTitle       = $formData['title'] ?? '';
+    $regTargetScope = $formData['target_scope'] ?? 'all';
+    $regContent     = $formData['content'] ?? '';
+    $regIsImportant = !empty($formData['is_important']);
+    $regStatus      = $formData['status'] ?? 'published';
+@endphp
+
 <!-- パンくずリスト & ページタイトル -->
 <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
     <div>
@@ -42,16 +59,16 @@
             <div class="row g-3 mb-3">
                 <div class="col-12 col-md-6">
                     <label for="noticeDate" class="form-label small fw-bold">掲載開始日時 <span class="text-danger">*</span></label>
-                    <input type="datetime-local" class="form-control @error('published_at') is-invalid @enderror" id="noticeDate" name="published_at" required value="{{ old('published_at', now()->format('Y-m-d\TH:i')) }}">
+                    <input type="datetime-local" class="form-control @error('published_at') is-invalid @enderror" id="noticeDate" name="published_at" required value="{{ old('published_at', $regPublishedAt) }}">
                     @error('published_at')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-12 col-md-6">
                     <label for="noticeCategory" class="form-label small fw-bold">カテゴリ <span class="text-danger">*</span></label>
                     <select class="form-select @error('category') is-invalid @enderror" id="noticeCategory" name="category" required>
                         <option value="">選択してください</option>
-                        <option value="important" {{ old('category') === 'important' ? 'selected' : '' }}>重要</option>
-                        <option value="maintenance" {{ old('category') === 'maintenance' ? 'selected' : '' }}>メンテナンス</option>
-                        <option value="info" {{ old('category', 'info') === 'info' ? 'selected' : '' }}>お知らせ</option>
+                        <option value="important" {{ old('category', $regCategory) === 'important' ? 'selected' : '' }}>重要</option>
+                        <option value="maintenance" {{ old('category', $regCategory) === 'maintenance' ? 'selected' : '' }}>メンテナンス</option>
+                        <option value="info" {{ old('category', $regCategory) === 'info' ? 'selected' : '' }}>お知らせ</option>
                     </select>
                     @error('category')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
@@ -59,7 +76,7 @@
 
             <div class="mb-3">
                 <label for="noticeTitle" class="form-label small fw-bold">タイトル <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('title') is-invalid @enderror" id="noticeTitle" name="title" placeholder="例: 利用規約改定のお知らせ" required value="{{ old('title') }}">
+                <input type="text" class="form-control @error('title') is-invalid @enderror" id="noticeTitle" name="title" placeholder="例: 利用規約改定のお知らせ" required value="{{ old('title', $regTitle) }}">
                 @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
@@ -67,15 +84,15 @@
                 <label class="form-label small fw-bold">開示対象範囲 <span class="text-danger">*</span></label>
                 <div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="target_scope" id="targetAll" value="all" {{ old('target_scope', 'all') === 'all' ? 'checked' : '' }}>
+                        <input class="form-check-input" type="radio" name="target_scope" id="targetAll" value="all" {{ old('target_scope', $regTargetScope) === 'all' ? 'checked' : '' }}>
                         <label class="form-check-label small" for="targetAll">全員</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="target_scope" id="targetVerified" value="verified" {{ old('target_scope') === 'verified' ? 'checked' : '' }}>
+                        <input class="form-check-input" type="radio" name="target_scope" id="targetVerified" value="verified" {{ old('target_scope', $regTargetScope) === 'verified' ? 'checked' : '' }}>
                         <label class="form-check-label small" for="targetVerified">認証企業のみ</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="target_scope" id="targetUnverified" value="unverified" {{ old('target_scope') === 'unverified' ? 'checked' : '' }}>
+                        <input class="form-check-input" type="radio" name="target_scope" id="targetUnverified" value="unverified" {{ old('target_scope', $regTargetScope) === 'unverified' ? 'checked' : '' }}>
                         <label class="form-check-label small" for="targetUnverified">非認証企業のみ</label>
                     </div>
                 </div>
@@ -84,13 +101,25 @@
 
             <div class="mb-3">
                 <label for="noticeBody" class="form-label small fw-bold">本文 <span class="text-danger">*</span></label>
-                <textarea class="form-control @error('content') is-invalid @enderror" id="noticeBody" name="content" rows="10" placeholder="お知らせ本文を入力してください。" required>{{ old('content') }}</textarea>
+                <textarea class="form-control @error('content') is-invalid @enderror" id="noticeBody" name="content" rows="10" placeholder="お知らせ本文を入力してください。" required>{{ old('content', $regContent) }}</textarea>
                 @error('content')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
 
             <!-- 添付ファイル -->
             <div class="mb-4">
                 <label for="noticeAttachment" class="form-label small fw-bold">添付ファイル <span class="text-muted fw-normal">(任意 / 1件のみ / 上限10MB)</span></label>
+                
+                @if (!empty($formData['attachment']['file_name']))
+                    <div class="alert alert-info py-2 px-3 small d-flex align-items-center justify-content-between mb-2">
+                        <div>
+                            <i class="bi bi-file-earmark-arrow-up me-1 text-primary"></i>
+                            前回の確認で選択されたファイル: <strong>{{ $formData['attachment']['file_name'] }}</strong>
+                            <span class="text-muted">({{ number_format($formData['attachment']['file_size'] / 1024, 1) }} KB)</span>
+                        </div>
+                        <span class="badge bg-primary">保持中</span>
+                    </div>
+                @endif
+
                 <input class="form-control @error('attachment_file') is-invalid @enderror" type="file" id="noticeAttachment" name="attachment_file">
                 <div class="form-text small text-muted">
                     PDF, DOCX, XLSX, PNG, JPG などのファイルを1件添付できます。
@@ -100,7 +129,7 @@
 
             <div class="mb-4">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="is_important" id="noticeImportantFlag" value="1" {{ old('is_important') ? 'checked' : '' }}>
+                    <input class="form-check-input" type="checkbox" name="is_important" id="noticeImportantFlag" value="1" {{ old('is_important', $regIsImportant) ? 'checked' : '' }}>
                     <label class="form-check-label small fw-bold text-danger" for="noticeImportantFlag">
                         <i class="bi bi-exclamation-circle-fill me-1"></i>重要フラグを付与する（ダッシュボード最上部に固定表示）
                     </label>
@@ -111,11 +140,11 @@
                 <label class="form-label small fw-bold">公開状態 <span class="text-danger">*</span></label>
                 <div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="status" id="statusPublished" value="published" {{ old('status', 'published') === 'published' ? 'checked' : '' }}>
+                        <input class="form-check-input" type="radio" name="status" id="statusPublished" value="published" {{ old('status', $regStatus) === 'published' ? 'checked' : '' }}>
                         <label class="form-check-label small" for="statusPublished">公開する</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="status" id="statusDraft" value="draft" {{ old('status') === 'draft' ? 'checked' : '' }}>
+                        <input class="form-check-input" type="radio" name="status" id="statusDraft" value="draft" {{ old('status', $regStatus) === 'draft' ? 'checked' : '' }}>
                         <label class="form-check-label small" for="statusDraft">下書き保存</label>
                     </div>
                 </div>

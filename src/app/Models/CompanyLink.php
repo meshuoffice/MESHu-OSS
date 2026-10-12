@@ -45,4 +45,57 @@ class CompanyLink extends Model
     {
         return $this->status === 'approved';
     }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isDenied(): bool
+    {
+        return $this->status === 'denied';
+    }
+
+    /**
+     * 指定企業IDから見た自社属性（buyer / seller）を取得
+     */
+    public function getRoleForCompany(int $companyId): ?string
+    {
+        if ((int)$this->buyer_company_id === $companyId) {
+            return 'buyer';
+        }
+        if ((int)$this->seller_company_id === $companyId) {
+            return 'seller';
+        }
+        return null;
+    }
+
+    /**
+     * 指定企業IDから見た取引先企業IDを取得
+     */
+    public function getPartnerCompanyId(int $myCompanyId): ?int
+    {
+        if ((int)$this->buyer_company_id === $myCompanyId) {
+            return (int)$this->seller_company_id;
+        }
+        if ((int)$this->seller_company_id === $myCompanyId) {
+            return (int)$this->buyer_company_id;
+        }
+        return null;
+    }
+
+    /**
+     * 指定企業IDから見た取引先企業モデルを取得
+     */
+    public function getPartnerCompany(int $myCompanyId): ?Company
+    {
+        if ((int)$this->buyer_company_id === $myCompanyId) {
+            return $this->sellerCompany;
+        }
+        if ((int)$this->seller_company_id === $myCompanyId) {
+            return $this->buyerCompany;
+        }
+        return null;
+    }
 }
+

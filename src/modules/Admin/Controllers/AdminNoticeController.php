@@ -147,6 +147,7 @@ class AdminNoticeController extends Controller
 
         $file = $request->file('attachment_file');
         $attachmentMeta = null;
+        $prevSession = session('ownnotice_confirm_data', []);
 
         if ($file && $file->isValid()) {
             $attachmentMeta = [
@@ -155,6 +156,8 @@ class AdminNoticeController extends Controller
                 'file_size' => $file->getSize(),
                 'data_b64'  => base64_encode(file_get_contents($file->getRealPath())),
             ];
+        } elseif (!empty($prevSession['attachment'])) {
+            $attachmentMeta = $prevSession['attachment'];
         }
 
         $formData = [
@@ -164,6 +167,7 @@ class AdminNoticeController extends Controller
             'content'      => $post['content'],
             'is_important' => !empty($post['is_important']),
             'is_published' => $post['status'] === 'published',
+            'status'       => $post['status'],
             'published_at' => str_replace('T', ' ', $post['published_at']),
             'attachment'   => $attachmentMeta,
         ];
@@ -270,7 +274,7 @@ class AdminNoticeController extends Controller
     /**
      * お知らせ編集画面
      */
-    public function edit(int|string $id): View|RedirectResponse
+    public function edit(Request $request, int|string $id): View|RedirectResponse
     {
         if ($redirect = $this->checkWriteAccess()) {
             return $redirect;
@@ -283,10 +287,19 @@ class AdminNoticeController extends Controller
             return redirect()->route('admin.notice.index')->with('error', '該当のお知らせが見つかりません。');
         }
 
+        // 初期アクセス時やキャンセル時などにクリア指定があればセッション削除
+        if ($request->query('clear')) {
+            session()->forget('ownnotice_edit_confirm_data_' . $id);
+        }
+
+        // 確認画面から「修正する」で戻った場合の入力内容を取得
+        $sessionData = session('ownnotice_edit_confirm_data_' . $id, []);
+
         return view('admin::ownnotice.edit', [
-            'title'      => 'お知らせ編集 | MESHu 事務局管理',
-            'activeMenu' => 'ownnotice',
-            'notice'     => $notice,
+            'title'       => 'お知らせ編集 | MESHu 事務局管理',
+            'activeMenu'  => 'ownnotice',
+            'notice'      => $notice,
+            'sessionData' => $sessionData,
         ]);
     }
 
@@ -338,6 +351,7 @@ class AdminNoticeController extends Controller
         $attachmentMeta = null;
         $isNewAttachment = false;
         $existingAttachment = $notice->attachments->first();
+        $prevSession = session('ownnotice_edit_confirm_data_' . $id, []);
 
         if ($file && $file->isValid()) {
             $attachmentMeta = [
@@ -348,6 +362,10 @@ class AdminNoticeController extends Controller
             ];
             $isNewAttachment = true;
             $deleteAttachment = false;
+        } elseif (!$deleteAttachment && !empty($prevSession['is_new_attachment']) && !empty($prevSession['attachment'])) {
+            // 前回の確認でアップロードされたファイルを維持
+            $attachmentMeta = $prevSession['attachment'];
+            $isNewAttachment = true;
         } elseif (!$deleteAttachment && $existingAttachment) {
             $attachmentMeta = [
                 'file_name' => $existingAttachment->file_name,
@@ -364,6 +382,7 @@ class AdminNoticeController extends Controller
             'content'           => $post['content'],
             'is_important'      => !empty($post['is_important']),
             'is_published'      => $post['status'] === 'published',
+            'status'            => $post['status'],
             'published_at'      => str_replace('T', ' ', $post['published_at']),
             'attachment'        => $attachmentMeta,
             'delete_attachment' => $deleteAttachment,

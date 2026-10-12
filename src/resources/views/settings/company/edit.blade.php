@@ -180,7 +180,7 @@
             </div>
 
             <!-- ボタンエリア -->
-            <div class="d-flex justify-content-end gap-2 border-top pt-4 mt-4">
+            <div class="d-flex justify-content-between border-top pt-4 mt-4">
                 <a href="{{ route('tenant.settings') }}" class="btn btn-outline-secondary px-4">キャンセル</a>
                 <button type="submit" class="btn btn-primary px-4">確認画面へ</button>
             </div>
