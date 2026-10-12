@@ -3,7 +3,7 @@
 @section('title', '招待内容の確認 | MESHu')
 
 @section('content')
-<div class="container-fluid p-4" style="max-width: 900px;">
+<div class="container-fluid p-4">
 
     <!-- パンくずリスト -->
     <div class="mb-4">
