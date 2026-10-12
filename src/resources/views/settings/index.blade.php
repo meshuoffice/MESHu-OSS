@@ -153,7 +153,7 @@
 
         <!-- 2. 招待先管理 -->
         <div class="col-12 col-md-6 col-xl-4">
-            <a href="{{ url('/invitation') }}" class="card setting-card bg-white p-4">
+            <a href="{{ route('tenant.invitation.index') }}" class="card setting-card bg-white p-4">
                 <div class="d-flex align-items-start gap-3 mb-3">
                     <div class="setting-icon-bg bg-warning-subtle text-warning-emphasis">
                         <i class="bi bi-envelope-paper-heart-fill"></i>
@@ -175,7 +175,7 @@
 
         <!-- 3. お知らせ配信管理 -->
         <div class="col-12 col-md-6 col-xl-4">
-            <a href="{{ url('/notice/manage') }}" class="card setting-card bg-white p-4">
+            <a href="{{ route('tenant.notice.manage.index') }}" class="card setting-card bg-white p-4">
                 <div class="d-flex align-items-start gap-3 mb-3">
                     <div class="setting-icon-bg bg-success-subtle text-success">
                         <i class="bi bi-megaphone-fill"></i>

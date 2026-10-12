@@ -14,15 +14,23 @@ class CompanyInvitationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $signupUrl;
+
     public function __construct(
         public Company $inviterCompany,
         public Invitation $invitation
-    ) {}
+    ) {
+        $this->signupUrl = url('/signup?invitation_code=' . $this->invitation->invitation_code);
+    }
 
     public function envelope(): Envelope
     {
+        $subject = !empty($this->invitation->mail_subject)
+            ? $this->invitation->mail_subject
+            : "【MESHu】{$this->inviterCompany->name}より取引連携のご招待";
+
         return new Envelope(
-            subject: "【MESHu】{$this->inviterCompany->name} 様よりMESHu取引連携のご案内",
+            subject: $subject,
         );
     }
 
@@ -30,6 +38,10 @@ class CompanyInvitationMail extends Mailable
     {
         return new Content(
             text: 'emails.company_invitation',
+            with: [
+                'signupUrl' => $this->signupUrl,
+            ],
         );
     }
 }
+
