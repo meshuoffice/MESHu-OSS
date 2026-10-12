@@ -139,4 +139,69 @@ class ProfileTest extends TestCase
             'notify_chat'    => true,
         ]);
     }
+
+    /**
+     * 自社内の他ユーザーと重複するメールアドレスはバリデーションエラーとなること
+     */
+    #[Test]
+    public function 自社内の他ユーザーと重複するメールアドレスはバリデーションエラーとなる()
+    {
+        // 自社内に同僚ユーザーを作成
+        User::create([
+            'company_id'      => $this->company->id,
+            'email'           => 'colleague@test.com',
+            'password_hash'   => Hash::make('Password123'),
+            'user_name'       => '同僚 花子',
+            'user_name_kana'  => 'ドウリョウ ハナコ',
+            'role'            => 'staff',
+            'status'          => 'active',
+            'is_all_assigned' => 1,
+        ]);
+
+        $response = $this->actingAs($this->user, 'web')->post('/profile/confirm', [
+            'user_name'      => '山田 太郎',
+            'user_name_kana' => 'ヤマダ タロウ',
+            'email'          => 'colleague@test.com', // 自社同僚と重複
+        ]);
+
+        $response->assertSessionHasErrors(['email']);
+    }
+
+    /**
+     * 他社ユーザーと同一のメールアドレスであっても自社内で重複がなければ変更可能であること
+     */
+    #[Test]
+    public function 他社ユーザーと同一のメールアドレスであっても自社内で重複がなければ確認画面へ進める()
+    {
+        // 別会社を作成
+        $otherCompany = Company::create([
+            'url_code' => 'other-company-' . uniqid(),
+            'name'     => '別会社株式会社',
+            'status'   => 'active',
+        ]);
+
+        // 別会社のユーザーを作成
+        User::create([
+            'company_id'      => $otherCompany->id,
+            'email'           => 'other-user@test.com',
+            'password_hash'   => Hash::make('Password123'),
+            'user_name'       => '他社 太郎',
+            'user_name_kana'  => 'タシャ タロウ',
+            'role'            => 'staff',
+            'status'          => 'active',
+            'is_all_assigned' => 1,
+        ]);
+
+        // 自社ユーザーが他社ユーザーと同じメールアドレスを指定
+        $response = $this->actingAs($this->user, 'web')->post('/profile/confirm', [
+            'user_name'      => '山田 太郎',
+            'user_name_kana' => 'ヤマダ タロウ',
+            'email'          => 'other-user@test.com',
+        ]);
+
+        // エラーなく確認画面が表示されること
+        $response->assertStatus(200);
+        $response->assertSessionHasNoErrors();
+    }
 }
+

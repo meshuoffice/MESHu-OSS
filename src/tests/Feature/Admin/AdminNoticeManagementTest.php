@@ -256,6 +256,13 @@ class AdminNoticeManagementTest extends TestCase
         $confirmResponse->assertSee('編集後タイトル_' . $unique);
         $confirmResponse->assertSee('添付ファイルを削除');
 
+        // 1-2. 確認画面から「修正する」で戻った場合に編集画面で入力値が維持されていることを検証
+        $backResponse = $this->actingAs($this->adminOwner, 'admin')
+            ->get(route('admin.notice.edit', $notice->id));
+        $backResponse->assertStatus(200);
+        $backResponse->assertSee('編集後タイトル_' . $unique);
+        $backResponse->assertSee('更新された本文です。');
+
         $sessionEditData = [
             'title'             => '編集後タイトル_' . $unique,
             'category'          => 'important',
@@ -414,5 +421,82 @@ class AdminNoticeManagementTest extends TestCase
             ->post(route('admin.notice.delete', $notice->id));
         $deleteResponse->assertRedirect(route('admin.notice.index'));
         $deleteResponse->assertSessionHas('success');
+    }
+
+    #[Test]
+    public function 非UTF8バイナリ画像添付ファイル（先頭0xffのJPEG）を正常に登録・更新・ダウンロードできる()
+    {
+        $unique = uniqid();
+        $jpegBinary = "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00\x01\x01\x01\x00`\x00`\x00\x00\xFF\xDB\x00C\x00dummy_jpeg_data";
+
+        // 1. 新規登録
+        $sessionData = [
+            'title'        => 'バイナリ添付テスト_' . $unique,
+            'category'     => 'info',
+            'target_scope' => 'all',
+            'content'      => 'バイナリ添付ファイルの登録テストです。',
+            'is_important' => false,
+            'is_published' => true,
+            'published_at' => now()->format('Y-m-d H:i:s'),
+            'attachment'   => [
+                'file_name' => 'photo_' . $unique . '.jpg',
+                'mime_type' => 'image/jpeg',
+                'file_size' => strlen($jpegBinary),
+                'data_b64'  => base64_encode($jpegBinary),
+            ],
+        ];
+
+        $storeResponse = $this->actingAs($this->adminOwner, 'admin')
+            ->withSession(['ownnotice_confirm_data' => $sessionData])
+            ->post(route('admin.notice.complete'));
+
+        $savedNotice = Notice::where('title', 'バイナリ添付テスト_' . $unique)->first();
+        $this->assertNotNull($savedNotice);
+        $this->assertDatabaseHas('notice_attachments', [
+            'notice_id' => $savedNotice->id,
+            'file_name' => 'photo_' . $unique . '.jpg',
+        ]);
+
+        $attachment = NoticeAttachment::where('notice_id', $savedNotice->id)->first();
+        $this->assertNotNull($attachment);
+
+        // ダウンロードして元のバイナリと完全一致するか検証
+        $dlResponse = $this->actingAs($this->adminOwner, 'admin')
+            ->get(route('admin.notice.download_attachment', $attachment->id));
+        $dlResponse->assertStatus(200);
+        $this->assertSame($jpegBinary, $dlResponse->getContent());
+
+        // 2. 編集で別のバイナリに差し替え更新
+        $newJpegBinary = "\xFF\xD8\xFF\xE1\x00\x18Exif\x00\x00updated_binary";
+        $sessionEditData = [
+            'title'             => 'バイナリ添付テスト更新_' . $unique,
+            'category'          => 'info',
+            'target_scope'      => 'all',
+            'content'           => '更新後本文',
+            'is_important'      => false,
+            'is_published'      => true,
+            'published_at'      => now()->format('Y-m-d H:i:s'),
+            'attachment'        => [
+                'file_name' => 'updated_' . $unique . '.jpg',
+                'mime_type' => 'image/jpeg',
+                'file_size' => strlen($newJpegBinary),
+                'data_b64'  => base64_encode($newJpegBinary),
+            ],
+            'delete_attachment' => false,
+            'is_new_attachment' => true,
+        ];
+
+        $updateResponse = $this->actingAs($this->adminOwner, 'admin')
+            ->withSession(['ownnotice_edit_confirm_data_' . $savedNotice->id => $sessionEditData])
+            ->post(route('admin.notice.update', $savedNotice->id));
+
+        $updatedAttachment = NoticeAttachment::where('notice_id', $savedNotice->id)->first();
+        $this->assertNotNull($updatedAttachment);
+        $this->assertSame('updated_' . $unique . '.jpg', $updatedAttachment->file_name);
+
+        $dlUpdateResponse = $this->actingAs($this->adminOwner, 'admin')
+            ->get(route('admin.notice.download_attachment', $updatedAttachment->id));
+        $dlUpdateResponse->assertStatus(200);
+        $this->assertSame($newJpegBinary, $dlUpdateResponse->getContent());
     }
 }

@@ -131,7 +131,7 @@
     <div class="row g-4">
         <!-- 1. つながり管理 (MESH) -->
         <div class="col-12 col-md-6 col-xl-4">
-            <a href="{{ url('/link') }}" class="card setting-card bg-white p-4">
+            <a href="{{ route('tenant.link.index') }}" class="card setting-card bg-white p-4">
                 <div class="d-flex align-items-start gap-3 mb-3">
                     <div class="setting-icon-bg bg-primary-subtle text-primary">
                         <i class="bi bi-share-fill"></i>

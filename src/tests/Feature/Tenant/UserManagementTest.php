@@ -207,6 +207,12 @@ class UserManagementTest extends TestCase
             'status'         => 'active',
             'is_all_assigned'=> 1,
         ]);
+
+        // 初期パスワード通知メールが送信されること
+        Mail::assertSent(\App\Mail\UserInitialPasswordMail::class, function ($mail) {
+            return $mail->hasTo('new-user@example.com')
+                && $mail->user->user_name === '新規 太郎';
+        });
     }
 
     #[Test]
@@ -296,6 +302,11 @@ class UserManagementTest extends TestCase
 
         $this->staffUserA->refresh();
         $this->assertNotEquals($oldHash, $this->staffUserA->password_hash);
+
+        // 仮パスワード再発行通知メールが送信されること
+        Mail::assertSent(\App\Mail\UserResetPasswordMail::class, function ($mail) {
+            return $mail->hasTo('staff-a@example.com');
+        });
     }
 
     #[Test]

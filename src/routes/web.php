@@ -3,7 +3,10 @@
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Auth\UserPasswordResetController;
 use App\Http\Controllers\SignupController;
+use App\Models\Company;
+use App\Models\CompanyLink;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,12 +34,116 @@ Route::middleware(['auth:web'])->group(function () {
     // ログアウト
     Route::match(['get', 'post'], '/logout', [UserAuthController::class, 'logout'])->name('logout');
 
-    // ダッシュボード
+    // ダッシュボード (mshdev 完全踏襲: 最近のつながり企業ボックス・サマリー反映)
     Route::get('/dashboard', function () {
         $user = Auth::guard('web')->user();
+        if (!$user) {
+            return redirect('/');
+        }
+
+        $company = $user->company;
+        if (!$company) {
+            abort(403, '所属企業情報が見つかりません。');
+        }
+
+        $companyId = $company->id;
+        $isAllAssigned = ($user->role === 'admin' || (int)$user->is_all_assigned === 1);
+        $assignedUserId = $isAllAssigned ? null : (int)$user->id;
+
+        // 最近のつながり企業一覧（全ステータス最新5件・担当絞り込み）
+        $query = DB::table('company_links as cl')
+            ->select([
+                'cl.id as link_id',
+                'cl.buyer_company_id',
+                'cl.seller_company_id',
+                'cl.status as link_status',
+                'cl.created_at as link_created_at',
+                'cl.updated_at as link_updated_at',
+                DB::raw("CASE WHEN cl.buyer_company_id = {$companyId} THEN 'buyer' ELSE 'seller' END as my_role"),
+                'partner.id as partner_company_id',
+                'partner.name as partner_name',
+                'partner.abbreviated_name as partner_abbreviated_name',
+                'partner.corporate_number as partner_corporate_number',
+                'partner.zip_code as partner_zip_code',
+                'partner.prefecture_code as partner_prefecture_code',
+                'partner.city as partner_city',
+                'partner.address as partner_address',
+                'partner.status as partner_company_status',
+                'cb.status as partner_badge_status',
+            ])
+            ->join('companies as partner', function ($join) use ($companyId) {
+                $join->on('partner.id', '=', DB::raw("CASE WHEN cl.buyer_company_id = {$companyId} THEN cl.seller_company_id ELSE cl.buyer_company_id END"));
+            })
+            ->leftJoin('company_badges as cb', 'cb.company_id', '=', 'partner.id')
+            ->where(function ($q) use ($companyId) {
+                $q->where('cl.buyer_company_id', $companyId)
+                  ->orWhere('cl.seller_company_id', $companyId);
+            })
+            ->where('partner.status', 'active');
+
+        // 個別担当絞り込み
+        if ($assignedUserId !== null) {
+            $query->join('user_assigned_links as ual', 'ual.company_link_id', '=', 'cl.id')
+                  ->where('ual.user_id', $assignedUserId);
+        }
+
+        $rows = $query->orderByDesc('cl.updated_at')
+                      ->orderByDesc('cl.id')
+                      ->limit(5)
+                      ->get();
+
+        $recentLinks = [];
+        foreach ($rows as $row) {
+            $prefName = Company::PREFECTURES[(int)$row->partner_prefecture_code] ?? '';
+            $address = trim($prefName . ($row->partner_city ?? '') . ($row->partner_address ?? ''));
+
+            $recentLinks[] = [
+                'link_id'            => (int)$row->link_id,
+                'my_role'            => $row->my_role,
+                'link_status'        => $row->link_status,
+                'partner_company_id' => (int)$row->partner_company_id,
+                'partner_name'       => $row->partner_name,
+                'partner_address'    => $address ?: '-',
+                'is_authenticated'   => ($row->partner_badge_status === 'active'),
+            ];
+        }
+
+        // つながり企業数（承認済み件数のみをカウント・担当絞り込み）
+        $countQuery = DB::table('company_links as cl')
+            ->join('companies as partner', function ($join) use ($companyId) {
+                $join->on('partner.id', '=', DB::raw("CASE WHEN cl.buyer_company_id = {$companyId} THEN cl.seller_company_id ELSE cl.buyer_company_id END"));
+            })
+            ->where(function ($q) use ($companyId) {
+                $q->where('cl.buyer_company_id', $companyId)
+                  ->orWhere('cl.seller_company_id', $companyId);
+            })
+            ->where('partner.status', 'active')
+            ->where('cl.status', 'approved');
+
+        if ($assignedUserId !== null) {
+            $countQuery->join('user_assigned_links as ual', 'ual.company_link_id', '=', 'cl.id')
+                       ->where('ual.user_id', $assignedUserId);
+        }
+
+        $approvedLinkCount = $countQuery->count();
+
+        // 最新のお知らせ（上位5件：重要固定優先）を取得
+        $recentNotices = \App\Models\Notice::with(['company'])
+            ->forCompany($companyId, $company->isAuthenticated())
+            ->orderByDesc('is_important')
+            ->orderByDesc('published_at')
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get();
+
         return view('tenant.dashboard', [
-            'currentCompany' => $user->company,
-            'activeMenu'     => 'dashboard',
+            'currentCompany'    => $company,
+            'activeMenu'        => 'dashboard',
+            'user'              => $user,
+            'userRole'          => $user->role,
+            'recentLinks'       => $recentLinks,
+            'approvedLinkCount' => $approvedLinkCount,
+            'recentNotices'     => $recentNotices,
         ]);
     })->name('dashboard');
 
@@ -74,6 +181,20 @@ Route::middleware(['auth:web'])->group(function () {
     });
 
 
+    // つながり管理 (MESH) (mshdev 準拠: /link)
+    Route::prefix('link')->name('tenant.link.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'index'])->name('index');
+        Route::get('/search', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'search'])->name('search');
+        Route::get('/show/{target_company_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'show'])->name('show');
+        Route::post('/request', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'requestLink'])->name('request');
+        Route::get('/request-complete', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'requestComplete'])->name('request_complete');
+        Route::get('/detail/{link_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'detail'])->name('detail');
+        Route::post('/status/{link_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'updateStatus'])->name('status');
+        Route::post('/assign-users/{link_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'assignUsers'])->name('assign_users');
+        Route::get('/invite', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'invite'])->name('invite');
+        Route::post('/send-invite', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'sendInvite'])->name('send_invite');
+    });
+
     Route::get('/settings/company', function () {
         $user = Auth::guard('web')->user();
         return redirect()->route('tenant.company.edit', ['url_code' => $user->company->url_code]);
@@ -91,6 +212,14 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/complete', [\App\Http\Controllers\Tenant\ProfileController::class, 'complete'])->name('tenant.profile.complete');
     });
 
+    // お知らせ (Notice) (mshdev 準拠: /notice)
+    Route::prefix('notice')->name('tenant.notice.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\NoticeController::class, 'index'])->name('index');
+        Route::get('/show/{id}', [\App\Http\Controllers\Tenant\NoticeController::class, 'show'])->name('show');
+        Route::get('/{id}', [\App\Http\Controllers\Tenant\NoticeController::class, 'show'])->name('detail');
+        Route::get('/attachment/{id}', [\App\Http\Controllers\Tenant\NoticeController::class, 'downloadAttachment'])->name('attachment');
+    });
+
     // 事務局へのお問い合わせ
     Route::prefix('contact')->group(function () {
         Route::get('/', [\App\Http\Controllers\Tenant\ContactController::class, 'index'])->name('tenant.contact');
@@ -102,7 +231,8 @@ Route::middleware(['auth:web'])->group(function () {
 
 
 // グローバルURLパラメータ制約（システム予約ルートや事務局ルートとの競合回避）
-Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|profile|contact|logout|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
+Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|link|notice|profile|contact|logout|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
+
 
 // 5. 企業別ログイン・パスワード再設定ルート（/{url_code}）
 Route::prefix('{url_code}')->middleware(['tenant'])->group(function () {
@@ -119,4 +249,3 @@ Route::prefix('{url_code}')->middleware(['tenant'])->group(function () {
     Route::get('/reset-password', [UserPasswordResetController::class, 'showResetForm'])->name('tenant.password.reset.form');
     Route::post('/reset-password', [UserPasswordResetController::class, 'resetPassword'])->name('tenant.password.update');
 });
-

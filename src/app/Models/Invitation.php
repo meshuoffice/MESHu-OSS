@@ -19,6 +19,7 @@ class Invitation extends Model
         'mail_detail',
         'company_name',
         'corporate_number',
+        'user_name',
         'registered_at',
     ];
 
@@ -35,4 +36,25 @@ class Invitation extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function isRegistered(): bool
+    {
+        return !is_null($this->registered_at);
+    }
+
+    public function getInviteeNameAttribute(): ?string
+    {
+        return $this->company_name;
+    }
+
+    public function getInviteeEmailAttribute(): ?string
+    {
+        return $this->email;
+    }
+
+    public function getInviterRoleAttribute(): ?string
+    {
+        return $this->buysell;
+    }
 }
+
