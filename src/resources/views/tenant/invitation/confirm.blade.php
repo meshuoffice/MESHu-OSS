@@ -34,8 +34,8 @@
                         <td class="font-monospace">{!! !empty($postData['corporate_number']) ? e($postData['corporate_number']) : '<span class="text-muted">（未入力）</span>' !!}</td>
                     </tr>
                     <tr>
-                        <th class="bg-light text-nowrap">招待先 担当者名</th>
-                        <td>{!! !empty($postData['user_name']) ? e($postData['user_name']) : '<span class="text-muted">（未入力）</span>' !!}</td>
+                        <th class="bg-light text-nowrap">招待先 管理者名</th>
+                        <td>{{ $postData['user_name'] }}</td>
                     </tr>
                     <tr>
                         <th class="bg-light text-nowrap">送信先 メールアドレス</th>

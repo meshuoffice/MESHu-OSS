@@ -71,10 +71,13 @@
                         <div class="form-text small">※事前に相手企業の法人番号が分かっている場合に入力してください。</div>
                     </div>
 
-                    <!-- 招待先 担当者名 -->
+                    <!-- 招待先 管理者名 -->
                     <div class="col-12 col-md-6">
-                        <label class="form-label fw-semibold small">招待先 担当者名 <span class="badge bg-secondary">任意</span></label>
-                        <input type="text" class="form-control" name="user_name" value="{{ old('user_name') }}" placeholder="例: 田中 太郎 様">
+                        <label class="form-label fw-semibold small">招待先 管理者名 <span class="badge bg-danger">必須</span></label>
+                        <input type="text" class="form-control {{ $errors->has('user_name') ? 'is-invalid' : '' }}" name="user_name" value="{{ old('user_name') }}" placeholder="例: 田中 太郎 様" required>
+                        @if ($errors->has('user_name'))
+                            <div class="invalid-feedback fw-semibold">{{ $errors->first('user_name') }}</div>
+                        @endif
                     </div>
 
                     <!-- 招待先 メールアドレス -->

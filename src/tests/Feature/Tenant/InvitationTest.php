@@ -194,6 +194,7 @@ class InvitationTest extends TestCase
         $response = $this->actingAs($this->adminUserA, 'web')->post('/invitation/confirm', [
             'company_name'     => '',
             'corporate_number' => '12345', // 13桁未満
+            'user_name'        => '',
             'email'            => 'invalid-email',
             'buysell'          => 'invalid',
             'mail_subject'     => '',
@@ -203,6 +204,7 @@ class InvitationTest extends TestCase
         $response->assertSessionHasErrors([
             'company_name',
             'corporate_number',
+            'user_name',
             'email',
             'buysell',
             'mail_subject',
@@ -217,6 +219,7 @@ class InvitationTest extends TestCase
         $response = $this->actingAs($this->adminUserA, 'web')->post('/invitation/confirm', [
             'company_name'     => '企業B別名社',
             'corporate_number' => $this->companyB->corporate_number,
+            'user_name'        => 'テスト管理者名',
             'email'            => 'partner-b@example.com',
             'buysell'          => 'buyer',
             'mail_subject'     => 'テスト件名',

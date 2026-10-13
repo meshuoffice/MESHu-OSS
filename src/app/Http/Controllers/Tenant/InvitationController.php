@@ -118,7 +118,7 @@ class InvitationController extends Controller
         $validated = $request->validate([
             'company_name'     => 'required|string|max:255',
             'corporate_number' => ['nullable', 'string', 'regex:/^[0-9]{13}$/'],
-            'user_name'        => 'nullable|string|max:100',
+            'user_name'        => 'required|string|max:100',
             'email'            => 'required|email|max:255',
             'buysell'          => 'required|in:buyer,seller',
             'mail_subject'     => 'required|string|max:255',
@@ -126,6 +126,7 @@ class InvitationController extends Controller
         ], [
             'company_name.required'     => '招待先 企業名は必須です。',
             'corporate_number.regex'   => '法人番号は半角数字13桁で入力してください。',
+            'user_name.required'        => '招待先 管理者名は必須です。',
             'email.required'            => '送信先メールアドレスは必須です。',
             'email.email'               => '有効なメールアドレス形式で入力してください。',
             'buysell.required'          => '登録時の連携属性は必須です。',
@@ -166,7 +167,7 @@ class InvitationController extends Controller
         $validated = $request->validate([
             'company_name'     => 'required|string|max:255',
             'corporate_number' => ['nullable', 'string', 'regex:/^[0-9]{13}$/'],
-            'user_name'        => 'nullable|string|max:100',
+            'user_name'        => 'required|string|max:100',
             'email'            => 'required|email|max:255',
             'buysell'          => 'required|in:buyer,seller',
             'mail_subject'     => 'required|string|max:255',
@@ -200,7 +201,7 @@ class InvitationController extends Controller
             'mail_detail'      => $validated['mail_detail'],
             'company_name'     => $validated['company_name'],
             'corporate_number' => $validated['corporate_number'] ?: null,
-            'user_name'        => $validated['user_name'] ?: null,
+            'user_name'        => $validated['user_name'],
         ]);
 
         // メール送信

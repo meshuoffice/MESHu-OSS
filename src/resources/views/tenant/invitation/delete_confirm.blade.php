@@ -46,7 +46,7 @@
                         <td class="font-monospace">{!! !empty($invitation->corporate_number) ? e($invitation->corporate_number) : '<span class="text-muted">（未入力）</span>' !!}</td>
                     </tr>
                     <tr>
-                        <th class="bg-light text-nowrap">招待先 担当者名</th>
+                        <th class="bg-light text-nowrap">招待先 管理者名</th>
                         <td>{!! !empty($invitation->user_name) ? e($invitation->user_name) : '<span class="text-muted">（未入力）</span>' !!}</td>
                     </tr>
                     <tr>

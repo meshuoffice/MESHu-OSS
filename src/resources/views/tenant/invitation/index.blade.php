@@ -71,7 +71,7 @@
                     <tr>
                         <th scope="col" class="ps-4">招待先 企業名</th>
                         <th scope="col">法人番号</th>
-                        <th scope="col">招待先 担当者名</th>
+                        <th scope="col">招待先 管理者名</th>
                         <th scope="col">送信先メールアドレス</th>
                         <th scope="col">登録時の連携属性</th>
                         <th scope="col">送信者</th>
