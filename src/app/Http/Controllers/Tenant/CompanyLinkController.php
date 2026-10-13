@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Tenant;
 
 use App\Http\Controllers\Controller;
-use App\Mail\CompanyInvitationMail;
 use App\Mail\CompanyLinkApprovedMail;
 use App\Mail\CompanyLinkRequestedMail;
 use App\Models\Company;
 use App\Models\CompanyLink;
-use App\Models\Invitation;
 use App\Models\User;
 use App\Models\UserAssignedLink;
 use Illuminate\Http\RedirectResponse;
@@ -589,77 +587,5 @@ class CompanyLinkController extends Controller
 
         return redirect()->route('tenant.link.detail', ['link_id' => $linkId])
             ->with('success', '担当従業員の割り当てを変更・保存しました。');
-    }
-
-    /**
-     * 9. 企業招待画面 (GET /link/invite)
-     */
-    public function invite(): View
-    {
-        $company = $this->authorizeAdmin();
-        $myCompanyId = $company->id;
-
-        $invitations = Invitation::where('company_id', $myCompanyId)
-            ->with('user')
-            ->orderBy('id', 'desc')
-            ->get();
-
-        return view('link.invite', [
-            'title'          => '未登録企業の招待送信',
-            'activeMenu'     => 'settings',
-            'currentCompany' => $company,
-            'invitations'    => $invitations,
-        ]);
-    }
-
-    /**
-     * 10. 招待メール送信実行 (POST /link/send-invite)
-     */
-    public function sendInvite(Request $request): RedirectResponse
-    {
-        $company = $this->authorizeAdmin();
-        $myCompanyId = $company->id;
-        $currentUser = Auth::guard('web')->user();
-
-        $request->validate([
-            'invitee_name'  => 'required|string|max:255',
-            'invitee_email' => 'required|email|max:255',
-        ]);
-
-        $inviteeName   = $request->input('invitee_name');
-        $inviteeEmail  = $request->input('invitee_email');
-        $personName    = $request->input('invitee_person_name');
-        $inviterRole   = $request->input('inviter_role', 'buyer');
-        $messageDetail = $request->input('message', '');
-
-        // 重複のない招待コードの生成
-        do {
-            $inviteCode = md5(uniqid('', true));
-            $exists = Invitation::where('invitation_code', $inviteCode)->exists();
-        } while ($exists);
-
-        $invitation = Invitation::create([
-            'company_id'       => $myCompanyId,
-            'user_id'          => $currentUser->id,
-            'invitation_code'  => $inviteCode,
-            'buysell'          => $inviterRole,
-            'email'            => $inviteeEmail,
-            'mail_subject'     => '【MESHu】取引連携へのご招待',
-            'mail_detail'      => $messageDetail ?? '',
-            'company_name'     => $inviteeName,
-            'corporate_number' => null,
-            'user_name'        => $personName,
-        ]);
-
-        // 招待メールの送信
-        try {
-            Mail::to($inviteeEmail)->send(
-                new CompanyInvitationMail($company, $invitation)
-            );
-        } catch (\Throwable $e) {
-            Log::error('招待メール送信エラー: ' . $e->getMessage());
-        }
-        return redirect()->route('tenant.link.invite')
-            ->with('success', '招待メールを正常に送信いたしました。（招待コード: ' . $inviteCode . '）');
     }
 }

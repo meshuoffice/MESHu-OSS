@@ -191,8 +191,6 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/detail/{link_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'detail'])->name('detail');
         Route::post('/status/{link_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'updateStatus'])->name('status');
         Route::post('/assign-users/{link_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'assignUsers'])->name('assign_users');
-        Route::get('/invite', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'invite'])->name('invite');
-        Route::post('/send-invite', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'sendInvite'])->name('send_invite');
     });
 
     Route::get('/settings/company', function () {
