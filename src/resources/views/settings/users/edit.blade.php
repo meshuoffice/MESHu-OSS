@@ -139,9 +139,13 @@
             </div>
 
             <!-- ボタンエリア -->
-            <div class="d-flex justify-content-between border-top pt-4 mt-4">
-                <a href="{{ route('tenant.users.show', ['user' => $targetUser->id]) }}" class="btn btn-outline-secondary px-4">キャンセル</a>
-                <button type="submit" class="btn btn-primary px-4">確認画面へ</button>
+            <div class="d-flex justify-content-between align-items-center border-top pt-4 mt-4">
+                <a href="{{ route('tenant.users.show', ['user' => $targetUser->id]) }}" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-left me-1"></i>キャンセル
+                </a>
+                <button type="submit" class="btn btn-primary px-5 fw-semibold shadow-sm">
+                    確認画面へ進む <i class="bi bi-arrow-right ms-1"></i>
+                </button>
             </div>
         </form>
     </div>

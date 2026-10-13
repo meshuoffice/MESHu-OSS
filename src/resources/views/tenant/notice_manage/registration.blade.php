@@ -90,8 +90,12 @@
 
                 <!-- ボタンエリア -->
                 <div class="d-flex justify-content-between align-items-center pt-4 border-top">
-                    <a href="{{ route('tenant.notice.manage.index') }}" class="btn btn-outline-secondary px-4">キャンセル</a>
-                    <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">確認画面へ進む</button>
+                    <a href="{{ route('tenant.notice.manage.index') }}" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left me-1"></i>キャンセル
+                    </a>
+                    <button type="submit" class="btn btn-primary px-5 fw-semibold shadow-sm">
+                        確認画面へ進む <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
                 </div>
 
             </form>
