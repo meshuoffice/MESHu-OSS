@@ -24,14 +24,18 @@
         </div>
     </div>
 
-    <!-- エラー表示 -->
+    <!-- エラー表示メッセージ -->
     @if ($errors->any())
-        <div class="alert alert-danger mb-4">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <div>
+                <strong>入力内容にエラーがあります。</strong> 下記の項目をご確認ください。
+                <ul class="mb-0 mt-1 small">
+                    @foreach ($errors->all() as $err)
+                        <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
     @endif
 
@@ -52,60 +56,75 @@
             <h5 class="card-title mb-0 fw-bold fs-6"><i class="bi bi-send-plus-fill me-2 text-primary"></i>招待メールの送信フォーム</h5>
         </div>
         <div class="card-body p-4">
-            <form action="{{ route('tenant.invitation.confirm') }}" method="POST">
+            <form action="{{ route('tenant.invitation.confirm') }}" method="POST" novalidate>
                 @csrf
                 <div class="row g-3">
                     <!-- 招待先 企業名 -->
                     <div class="col-12 col-md-6">
                         <label class="form-label fw-semibold small">招待先 企業名 <span class="badge bg-danger">必須</span></label>
-                        <input type="text" class="form-control" name="company_name" value="{{ old('company_name') }}" placeholder="例: 株式会社パートナーテクノロジー" required>
+                        <input type="text" class="form-control @error('company_name') is-invalid @enderror" name="company_name" value="{{ old('company_name') }}" placeholder="例: 株式会社パートナーテクノロジー" required>
+                        @error('company_name')
+                            <div class="invalid-feedback fw-semibold">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <!-- 招待先 法人番号 -->
                     <div class="col-12 col-md-6">
                         <label class="form-label fw-semibold small">招待先 法人番号 (13桁) <span class="badge bg-secondary">任意</span></label>
-                        <input type="text" class="form-control font-monospace {{ $errors->has('corporate_number') ? 'is-invalid' : '' }}" name="corporate_number" value="{{ old('corporate_number') }}" maxlength="13" placeholder="例: 1234567890123 (半角数字13桁)">
-                        @if ($errors->has('corporate_number'))
-                            <div class="invalid-feedback fw-semibold">{{ $errors->first('corporate_number') }}</div>
-                        @endif
+                        <input type="text" class="form-control font-monospace @error('corporate_number') is-invalid @enderror" name="corporate_number" value="{{ old('corporate_number') }}" maxlength="13" placeholder="例: 1234567890123 (半角数字13桁)">
+                        @error('corporate_number')
+                            <div class="invalid-feedback fw-semibold">{{ $message }}</div>
+                        @enderror
                         <div class="form-text small">※事前に相手企業の法人番号が分かっている場合に入力してください。</div>
                     </div>
 
                     <!-- 招待先 管理者名 -->
                     <div class="col-12 col-md-6">
                         <label class="form-label fw-semibold small">招待先 管理者名 <span class="badge bg-danger">必須</span></label>
-                        <input type="text" class="form-control {{ $errors->has('user_name') ? 'is-invalid' : '' }}" name="user_name" value="{{ old('user_name') }}" placeholder="例: 田中 太郎 様" required>
-                        @if ($errors->has('user_name'))
-                            <div class="invalid-feedback fw-semibold">{{ $errors->first('user_name') }}</div>
-                        @endif
+                        <input type="text" class="form-control @error('user_name') is-invalid @enderror" name="user_name" value="{{ old('user_name') }}" placeholder="例: 田中 太郎 様" required>
+                        @error('user_name')
+                            <div class="invalid-feedback fw-semibold">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <!-- 招待先 メールアドレス -->
                     <div class="col-12 col-md-6">
                         <label class="form-label fw-semibold small">招待先 メールアドレス <span class="badge bg-danger">必須</span></label>
-                        <input type="email" class="form-control font-monospace" name="email" value="{{ old('email') }}" placeholder="example@partner.co.jp" required>
+                        <input type="email" class="form-control font-monospace @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" placeholder="example@partner.co.jp" required>
+                        @error('email')
+                            <div class="invalid-feedback fw-semibold">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <!-- 登録時の連携属性 -->
                     <div class="col-12 col-md-6">
                         <label class="form-label fw-semibold small">登録時の連携属性 <span class="badge bg-danger">必須</span></label>
-                        <select class="form-select" name="buysell" required>
+                        <select class="form-select @error('buysell') is-invalid @enderror" name="buysell" required>
                             <option value="buyer" {{ old('buysell', 'buyer') === 'buyer' ? 'selected' : '' }}>自社が「購入側 (買手)」として相手企業から購入する</option>
                             <option value="seller" {{ old('buysell') === 'seller' ? 'selected' : '' }}>自社が「販売側 (売手)」として相手企業へ販売する</option>
                         </select>
+                        @error('buysell')
+                            <div class="invalid-feedback fw-semibold">{{ $message }}</div>
+                        @enderror
                         <div class="form-text small">招待登録完了時、この属性に沿って取引先連携が自動生成されます。</div>
                     </div>
 
                     <!-- 招待メール件名 -->
                     <div class="col-12 col-md-6">
                         <label class="form-label fw-semibold small">招待メール件名 <span class="badge bg-danger">必須</span></label>
-                        <input type="text" class="form-control" name="mail_subject" value="{{ old('mail_subject', $defaultSubject) }}" required>
+                        <input type="text" class="form-control @error('mail_subject') is-invalid @enderror" name="mail_subject" value="{{ old('mail_subject', $defaultSubject) }}" required>
+                        @error('mail_subject')
+                            <div class="invalid-feedback fw-semibold">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <!-- 招待メッセージ本文 -->
                     <div class="col-12">
                         <label class="form-label fw-semibold small">招待メッセージ本文 <span class="badge bg-danger">必須</span></label>
-                        <textarea class="form-control" name="mail_detail" rows="6" placeholder="相手企業へのあいさつ文や補足メッセージをご記入ください..." required>{{ old('mail_detail', $defaultDetail) }}</textarea>
+                        <textarea class="form-control @error('mail_detail') is-invalid @enderror" name="mail_detail" rows="6" placeholder="相手企業へのあいさつ文や補足メッセージをご記入ください..." required>{{ old('mail_detail', $defaultDetail) }}</textarea>
+                        @error('mail_detail')
+                            <div class="invalid-feedback fw-semibold">{{ $message }}</div>
+                        @enderror
                         <div class="form-text small text-muted">※実際の送信メールには、本文の末尾にシステムが自動生成する専用登録URL（一意の招待コード付き）が追記されます。</div>
                     </div>
                 </div>

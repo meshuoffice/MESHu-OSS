@@ -191,16 +191,19 @@ class InvitationTest extends TestCase
     #[Test]
     public function test_confirm_validation_fails_with_invalid_data(): void
     {
-        $response = $this->actingAs($this->adminUserA, 'web')->post('/invitation/confirm', [
-            'company_name'     => '',
-            'corporate_number' => '12345', // 13桁未満
-            'user_name'        => '',
-            'email'            => 'invalid-email',
-            'buysell'          => 'invalid',
-            'mail_subject'     => '',
-            'mail_detail'      => '',
-        ]);
+        $response = $this->actingAs($this->adminUserA, 'web')
+            ->from('/invitation/new')
+            ->post('/invitation/confirm', [
+                'company_name'     => '',
+                'corporate_number' => '12345', // 13桁未満
+                'user_name'        => '',
+                'email'            => 'invalid-email',
+                'buysell'          => 'invalid',
+                'mail_subject'     => '',
+                'mail_detail'      => '',
+            ]);
 
+        $response->assertRedirect('/invitation/new');
         $response->assertSessionHasErrors([
             'company_name',
             'corporate_number',
@@ -210,6 +213,12 @@ class InvitationTest extends TestCase
             'mail_subject',
             'mail_detail',
         ]);
+
+        $followResponse = $this->followRedirects($response);
+        $followResponse->assertStatus(200);
+        $followResponse->assertSee('alert-danger');
+        $followResponse->assertSee('入力内容にエラーがあります。');
+        $followResponse->assertSee('下記の項目をご確認ください。');
     }
 
     #[Test]
