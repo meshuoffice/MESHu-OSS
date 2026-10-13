@@ -95,7 +95,7 @@ return new class extends Migration
             $table->string('position', 100)->nullable();
             $table->string('role', 20)->default('staff'); // admin, staff
             $table->string('status', 20)->default('active'); // suspended, active, deleted
-            $table->smallInteger('is_all_assigned')->default(0); // 0: 全担当, 1: 担当分け
+            $table->smallInteger('is_all_assigned')->default(1); // 1: 全担当[デフォルト], 0: 個別担当分け
             $table->boolean('notify_trade')->default(true);
             $table->boolean('notify_comment')->default(true);
             $table->boolean('notify_chat')->default(true);
@@ -116,7 +116,7 @@ return new class extends Migration
         DB::statement("COMMENT ON COLUMN users.position IS '役職名'");
         DB::statement("COMMENT ON COLUMN users.role IS '社内権限（admin: 管理者, staff: 一般社員）'");
         DB::statement("COMMENT ON COLUMN users.status IS 'ユーザーアカウント状態（suspended: 停止中, active: 稼働, deleted: 削除済）'");
-        DB::statement("COMMENT ON COLUMN users.is_all_assigned IS '取引先担当区分（0: 全担当[デフォルト], 1: 担当分け）'");
+        DB::statement("COMMENT ON COLUMN users.is_all_assigned IS '全取引先担当フラグ（1: 全担当[デフォルト], 0: 個別担当分け）'");
         DB::statement("COMMENT ON COLUMN users.notify_trade IS '取引通知メール (true: ON, false: OFF)'");
         DB::statement("COMMENT ON COLUMN users.notify_comment IS 'コメント通知メール (true: ON, false: OFF)'");
         DB::statement("COMMENT ON COLUMN users.notify_chat IS 'チャット通知メール (true: ON, false: OFF)'");

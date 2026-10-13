@@ -279,7 +279,6 @@ class AdminCompanyController extends Controller
                     'position'        => $postData['position'] ?? null,
                     'role'            => 'admin',
                     'status'          => 'active',
-                    'is_all_assigned' => 1,
                     'notify_trade'    => true,
                     'notify_comment'  => true,
                     'notify_chat'     => true,

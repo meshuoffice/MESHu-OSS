@@ -176,7 +176,7 @@ class SignupController extends Controller
                     'status'                => 'suspended',
                 ]);
 
-                // 初期管理者登録
+                // 初期管理者登録（is_all_assignedはPostgreSQLデフォルト: 1[全担当]に委任）
                 User::create([
                     'company_id'      => $company->id,
                     'email'           => $signupData['adminEmail'],
@@ -187,7 +187,6 @@ class SignupController extends Controller
                     'position'        => $signupData['position'] ?? null,
                     'role'            => 'admin',
                     'status'          => 'active',
-                    'is_all_assigned' => 0,
                 ]);
 
                 // 招待経由の場合、自動的に company_links へ登録 ＆ invitations から削除
