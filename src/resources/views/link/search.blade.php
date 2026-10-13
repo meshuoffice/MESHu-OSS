@@ -211,7 +211,7 @@
             </div>
         </div>
         <div>
-            <a href="{{ route('tenant.link.invite') }}" class="btn btn-outline-primary fw-semibold text-nowrap px-4 py-2">
+            <a href="{{ route('tenant.invitation.new') }}" class="btn btn-outline-primary fw-semibold text-nowrap px-4 py-2">
                 <i class="bi bi-send me-1"></i>企業を招待する
             </a>
         </div>

@@ -55,7 +55,7 @@ class SettingsTest extends TestCase
         $response = $this->actingAs($adminUser, 'web')->get('/settings');
 
         $response->assertStatus(200);
-        $response->assertSee('各種設定ポータル');
+        $response->assertSee('各種設定');
         $response->assertSee('企業情報メンテナンス');
         $response->assertSee('従業員管理');
     }

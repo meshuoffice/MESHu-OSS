@@ -153,10 +153,11 @@ class SignupTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('users', [
-            'email'     => 'new-admin@sample-corp.com',
-            'user_name' => '新規 太郎',
-            'role'      => 'admin',
-            'status'    => 'active',
+            'email'           => 'new-admin@sample-corp.com',
+            'user_name'       => '新規 太郎',
+            'role'            => 'admin',
+            'status'          => 'active',
+            'is_all_assigned' => 1,
         ]);
 
         // 4. メールの配信検証（登録者宛て＆事務局通知）

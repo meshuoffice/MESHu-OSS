@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="d-flex align-items-center justify-content-center" style="min-height: 70vh;">
-    <div class="card card-custom bg-white p-5 text-center shadow border-0" style="max-width: 500px; width: 100%;">
+    <div class="card card-custom bg-white p-5 text-center shadow border-0" style="max-width: 680px; width: 100%;">
         <div class="text-success mb-3" style="font-size: 4rem;">
             <i class="bi bi-check-circle-fill"></i>
         </div>

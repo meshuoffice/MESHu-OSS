@@ -5,7 +5,6 @@ namespace Tests\Feature\Tenant;
 use App\Models\Company;
 use App\Models\CompanyBadge;
 use App\Models\CompanyLink;
-use App\Models\Invitation;
 use App\Models\Owner;
 use App\Models\User;
 use App\Models\UserAssignedLink;
@@ -422,36 +421,12 @@ class CompanyLinkTest extends TestCase
     }
 
     #[Test]
-    public function 未登録企業への招待メールを送信できる(): void
+    public function 検索画面から招待作成画面へのリンクが正しく提供される(): void
     {
-        Mail::fake();
-
-        $responsePage = $this->actingAs($this->adminUserA, 'web')->get('/link/invite');
-        $responsePage->assertStatus(200);
-        $responsePage->assertSee('未登録企業の招待送信');
-
-        $responseSend = $this->actingAs($this->adminUserA, 'web')->post('/link/send-invite', [
-            'invitee_name'        => '新規取引先株式会社',
-            'invitee_email'       => 'invitee@example.com',
-            'invitee_person_name' => '取引 太郎',
-            'inviter_role'        => 'buyer',
-            'message'             => '連携のご案内です。',
-        ]);
-
-        $responseSend->assertRedirect(route('tenant.link.invite'));
-        $responseSend->assertSessionHas('success');
-
-        $this->assertDatabaseHas('invitations', [
-            'company_id'   => $this->companyA->id,
-            'user_id'      => $this->adminUserA->id,
-            'company_name' => '新規取引先株式会社',
-            'email'        => 'invitee@example.com',
-            'buysell'      => 'buyer',
-        ]);
-
-        // 招待先宛てに招待メールが送信されること
-        Mail::assertSent(\App\Mail\CompanyInvitationMail::class, function ($mail) {
-            return $mail->hasTo('invitee@example.com');
-        });
+        $response = $this->actingAs($this->adminUserA, 'web')->get('/link/search');
+        $response->assertStatus(200);
+        $response->assertSee('お探しの企業が見つかりませんか？');
+        $response->assertSee('企業を招待する');
+        $response->assertSee(route('tenant.invitation.new'));
     }
 }

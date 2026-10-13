@@ -14,10 +14,8 @@ class TransactionHistory extends Model
     protected $fillable = [
         'transaction_id',
         'user_id',
-        'action_name',
-        'from_status',
-        'to_status',
-        'comment',
+        'status',
+        'note',
         'created_at',
     ];
 

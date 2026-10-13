@@ -191,8 +191,6 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/detail/{link_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'detail'])->name('detail');
         Route::post('/status/{link_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'updateStatus'])->name('status');
         Route::post('/assign-users/{link_id}', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'assignUsers'])->name('assign_users');
-        Route::get('/invite', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'invite'])->name('invite');
-        Route::post('/send-invite', [\App\Http\Controllers\Tenant\CompanyLinkController::class, 'sendInvite'])->name('send_invite');
     });
 
     Route::get('/settings/company', function () {
@@ -210,6 +208,33 @@ Route::middleware(['auth:web'])->group(function () {
         Route::post('/confirm', [\App\Http\Controllers\Tenant\ProfileController::class, 'confirm'])->name('tenant.profile.confirm');
         Route::post('/update', [\App\Http\Controllers\Tenant\ProfileController::class, 'update'])->name('tenant.profile.update');
         Route::get('/complete', [\App\Http\Controllers\Tenant\ProfileController::class, 'complete'])->name('tenant.profile.complete');
+    });
+
+    // 招待先管理 (mshdev 準拠: /invitation)
+    Route::prefix('invitation')->name('tenant.invitation.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\InvitationController::class, 'index'])->name('index');
+        Route::get('/new', [\App\Http\Controllers\Tenant\InvitationController::class, 'new'])->name('new');
+        Route::post('/confirm', [\App\Http\Controllers\Tenant\InvitationController::class, 'confirm'])->name('confirm');
+        Route::post('/send', [\App\Http\Controllers\Tenant\InvitationController::class, 'send'])->name('send');
+        Route::get('/complete', [\App\Http\Controllers\Tenant\InvitationController::class, 'complete'])->name('complete');
+        Route::get('/show/{id}', [\App\Http\Controllers\Tenant\InvitationController::class, 'show'])->name('show');
+        Route::get('/delete-confirm/{id}', [\App\Http\Controllers\Tenant\InvitationController::class, 'deleteConfirm'])->name('delete_confirm');
+        Route::post('/delete/{id}', [\App\Http\Controllers\Tenant\InvitationController::class, 'destroy'])->name('delete');
+    });
+
+    // お知らせ配信管理 (mshdev 準拠: /notice/manage)
+    Route::prefix('notice/manage')->name('tenant.notice.manage.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'index'])->name('index');
+        Route::get('/show/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'show'])->name('show');
+        Route::get('/new', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'new'])->name('new');
+        Route::post('/confirm', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'confirm'])->name('confirm');
+        Route::post('/create', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'create'])->name('create');
+        Route::get('/edit/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'edit'])->name('edit');
+        Route::post('/confirm-update/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'confirmUpdate'])->name('confirm_update');
+        Route::post('/update/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'update'])->name('update');
+        Route::get('/complete/{id?}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'complete'])->name('complete');
+        Route::get('/delete/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'deleteConfirm'])->name('delete_confirm');
+        Route::post('/delete/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'destroy'])->name('delete');
     });
 
     // お知らせ (Notice) (mshdev 準拠: /notice)
@@ -231,7 +256,7 @@ Route::middleware(['auth:web'])->group(function () {
 
 
 // グローバルURLパラメータ制約（システム予約ルートや事務局ルートとの競合回避）
-Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|link|notice|profile|contact|logout|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
+Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|link|invitation|notice|profile|contact|logout|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
 
 
 // 5. 企業別ログイン・パスワード再設定ルート（/{url_code}）

@@ -20,11 +20,6 @@ class Invitation extends Model
         'company_name',
         'corporate_number',
         'user_name',
-        'registered_at',
-    ];
-
-    protected $casts = [
-        'registered_at' => 'datetime',
     ];
 
     public function company(): BelongsTo
@@ -35,11 +30,6 @@ class Invitation extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function isRegistered(): bool
-    {
-        return !is_null($this->registered_at);
     }
 
     public function getInviteeNameAttribute(): ?string

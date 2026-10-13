@@ -17,18 +17,18 @@ return new class extends Migration
             $table->id();
             $table->foreignId('parent_id')->nullable()->constrained('companies')->onDelete('set null');
             $table->foreignId('invitation_company_id')->nullable()->constrained('companies')->onDelete('set null');
-            $table->string('url_code', 50)->unique();
+            $table->text('url_code')->unique();
             $table->string('corporate_number', 13)->nullable();
-            $table->string('name', 255);
-            $table->string('abbreviated_name', 100)->nullable();
-            $table->string('abbreviated_kana', 100)->nullable();
-            $table->string('sub_name', 100)->nullable();
-            $table->string('zip_code', 8)->nullable();
+            $table->text('name');
+            $table->text('abbreviated_name')->nullable();
+            $table->text('abbreviated_kana')->nullable();
+            $table->text('sub_name')->nullable();
+            $table->text('zip_code')->nullable();
             $table->smallInteger('prefecture_code')->nullable();
-            $table->string('city', 100)->nullable();
-            $table->string('address', 255)->nullable();
-            $table->string('homepage', 255)->nullable();
-            $table->string('tel', 20)->nullable();
+            $table->text('city')->nullable();
+            $table->text('address')->nullable();
+            $table->text('homepage')->nullable();
+            $table->text('tel')->nullable();
             $table->smallInteger('tax_rate')->default(10);
             $table->string('amount_rounding', 10)->default('round'); // round, floor, ceil
             $table->string('tax_rounding', 10)->default('round');    // round, floor, ceil
@@ -87,15 +87,15 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
-            $table->string('email', 255);
-            $table->string('password_hash', 255);
-            $table->string('user_name', 100);
-            $table->string('user_name_kana', 100)->nullable();
-            $table->string('department', 100)->nullable();
-            $table->string('position', 100)->nullable();
+            $table->text('email');
+            $table->text('password_hash');
+            $table->text('user_name');
+            $table->text('user_name_kana')->nullable();
+            $table->text('department')->nullable();
+            $table->text('position')->nullable();
             $table->string('role', 20)->default('staff'); // admin, staff
             $table->string('status', 20)->default('active'); // suspended, active, deleted
-            $table->smallInteger('is_all_assigned')->default(0); // 0: 全担当, 1: 担当分け
+            $table->smallInteger('is_all_assigned')->default(1); // 1: 全担当[デフォルト], 0: 個別担当分け
             $table->boolean('notify_trade')->default(true);
             $table->boolean('notify_comment')->default(true);
             $table->boolean('notify_chat')->default(true);
@@ -116,7 +116,7 @@ return new class extends Migration
         DB::statement("COMMENT ON COLUMN users.position IS '役職名'");
         DB::statement("COMMENT ON COLUMN users.role IS '社内権限（admin: 管理者, staff: 一般社員）'");
         DB::statement("COMMENT ON COLUMN users.status IS 'ユーザーアカウント状態（suspended: 停止中, active: 稼働, deleted: 削除済）'");
-        DB::statement("COMMENT ON COLUMN users.is_all_assigned IS '取引先担当区分（0: 全担当[デフォルト], 1: 担当分け）'");
+        DB::statement("COMMENT ON COLUMN users.is_all_assigned IS '全取引先担当フラグ（1: 全担当[デフォルト], 0: 個別担当分け）'");
         DB::statement("COMMENT ON COLUMN users.notify_trade IS '取引通知メール (true: ON, false: OFF)'");
         DB::statement("COMMENT ON COLUMN users.notify_comment IS 'コメント通知メール (true: ON, false: OFF)'");
         DB::statement("COMMENT ON COLUMN users.notify_chat IS 'チャット通知メール (true: ON, false: OFF)'");

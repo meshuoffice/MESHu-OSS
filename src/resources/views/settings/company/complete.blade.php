@@ -9,7 +9,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-1">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定ポータル</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('tenant.company.edit', ['url_code' => $currentCompany->url_code]) }}" class="text-decoration-none">企業情報メンテナンス</a></li>
                 <li class="breadcrumb-item active" aria-current="page">完了</li>
             </ol>
@@ -19,7 +19,7 @@
 </div>
 
 <!-- 完了表示 -->
-<div class="card card-custom bg-white shadow-sm py-5">
+<div class="card card-custom bg-white mx-auto shadow-sm py-5" style="max-width: 680px;">
     <div class="card-body text-center py-4">
         <div class="mb-4">
             <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem; display: inline-block; line-height: 1;"></i>

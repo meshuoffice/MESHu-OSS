@@ -62,12 +62,12 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('invitation_code', 64)->unique();
             $table->string('buysell', 20)->default('buyer');
-            $table->string('email', 255);
-            $table->string('mail_subject', 255);
+            $table->text('email');
+            $table->text('mail_subject');
             $table->text('mail_detail');
-            $table->string('company_name', 255);
+            $table->text('company_name');
             $table->string('corporate_number', 13)->nullable();
-            $table->string('user_name', 100)->nullable();
+            $table->text('user_name')->nullable();
             $table->timestamp('registered_at')->nullable();
             $table->timestamps();
         });
@@ -84,7 +84,7 @@ return new class extends Migration
         DB::statement("COMMENT ON COLUMN invitations.mail_detail IS '招待メール本文'");
         DB::statement("COMMENT ON COLUMN invitations.company_name IS '招待先 企業名'");
         DB::statement("COMMENT ON COLUMN invitations.corporate_number IS '招待先 法人番号 (13桁)'");
-        DB::statement("COMMENT ON COLUMN invitations.user_name IS '招待先 担当者名'");
+        DB::statement("COMMENT ON COLUMN invitations.user_name IS '招待先 管理者名'");
         DB::statement("COMMENT ON COLUMN invitations.registered_at IS '招待経由での本登録完了日時'");
         DB::statement("COMMENT ON COLUMN invitations.created_at IS '招待作成日時'");
         DB::statement("COMMENT ON COLUMN invitations.updated_at IS '更新日時'");

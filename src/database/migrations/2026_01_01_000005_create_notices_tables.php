@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('created_by_user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('category', 50)->default('info'); // important, maintenance, info
             $table->string('target_scope', 50)->default('all'); // all, verified, unverified
-            $table->string('title', 255);
+            $table->text('title');
             $table->text('content');
             $table->boolean('is_important')->default(false);
             $table->boolean('is_published')->default(false);

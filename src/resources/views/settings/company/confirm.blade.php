@@ -27,7 +27,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-1">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定ポータル</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('tenant.company.edit', ['url_code' => $currentCompany->url_code]) }}" class="text-decoration-none">企業情報メンテナンス</a></li>
                 <li class="breadcrumb-item active" aria-current="page">変更内容確認</li>
             </ol>

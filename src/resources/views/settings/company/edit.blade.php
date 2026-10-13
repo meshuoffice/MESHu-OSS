@@ -9,13 +9,28 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-1">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定ポータル</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('tenant.settings') }}" class="text-decoration-none">各種設定</a></li>
                 <li class="breadcrumb-item active" aria-current="page">企業情報メンテナンス</li>
             </ol>
         </nav>
         <h1 class="h3 m-0 fw-bold">企業情報メンテナンス</h1>
     </div>
 </div>
+
+<!-- エラー表示メッセージ -->
+@if ($errors->any())
+    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <div>
+            <strong>入力内容にエラーがあります。</strong> 下記の項目をご確認ください。
+            <ul class="mb-0 mt-1 small">
+                @foreach ($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+@endif
 
 <!-- 編集フォーム -->
 <div class="card card-custom bg-white shadow-sm">
@@ -180,9 +195,13 @@
             </div>
 
             <!-- ボタンエリア -->
-            <div class="d-flex justify-content-between border-top pt-4 mt-4">
-                <a href="{{ route('tenant.settings') }}" class="btn btn-outline-secondary px-4">キャンセル</a>
-                <button type="submit" class="btn btn-primary px-4">確認画面へ</button>
+            <div class="d-flex justify-content-between align-items-center border-top pt-4 mt-4">
+                <a href="{{ route('tenant.settings') }}" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-arrow-left me-1"></i>キャンセル
+                </a>
+                <button type="submit" class="btn btn-primary px-5 fw-semibold shadow-sm">
+                    確認画面へ進む <i class="bi bi-arrow-right ms-1"></i>
+                </button>
             </div>
         </form>
     </div>
