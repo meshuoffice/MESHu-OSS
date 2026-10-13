@@ -17,6 +17,21 @@
     </div>
 </div>
 
+<!-- エラー表示メッセージ -->
+@if ($errors->any())
+    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <div>
+            <strong>入力内容にエラーがあります。</strong> 下記の項目をご確認ください。
+            <ul class="mb-0 mt-1 small">
+                @foreach ($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+@endif
+
 <!-- 編集フォーム -->
 <div class="card card-custom bg-white shadow-sm">
     <div class="card-header bg-white py-3 border-bottom">

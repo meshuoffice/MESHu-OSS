@@ -302,4 +302,36 @@ class CompanySettingsTest extends TestCase
             'tax_rounding'     => 'floor',
         ]);
     }
+
+    #[Test]
+    public function バリデーションエラー時に編集画面上部に赤色アラートが表示される(): void
+    {
+        $invalidData = [
+            'name'             => '', // 必須欠落
+            'abbreviated_name' => '',
+            'abbreviated_kana' => '',
+            'url_code'         => 'company-a',
+            'tel'              => '不正電話番号',
+            'zip_code'         => '100-0001',
+            'prefecture_code'  => 13,
+            'city'             => '千代田区',
+            'address'          => '1-1',
+            'tax_rate'         => 10,
+            'amount_rounding'  => 'round',
+            'tax_rounding'     => 'round',
+        ];
+
+        $response = $this->actingAs($this->adminUserA, 'web')
+            ->from("/{$this->companyA->url_code}/settings/company")
+            ->post("/{$this->companyA->url_code}/settings/company/confirm", $invalidData);
+
+        $response->assertRedirect("/{$this->companyA->url_code}/settings/company");
+
+        $followResponse = $this->followRedirects($response);
+        $followResponse->assertStatus(200);
+        $followResponse->assertSee('alert-danger');
+        $followResponse->assertSee('入力内容にエラーがあります。');
+        $followResponse->assertSee('下記の項目をご確認ください。');
+    }
 }
+
