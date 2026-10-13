@@ -62,9 +62,9 @@ return new class extends Migration
             $table->foreignId('transaction_id')->constrained('transactions')->onDelete('cascade');
             $table->integer('line_no')->default(1);
             $table->string('item_name', 255);
-            $table->string('item_code', 100)->nullable();
+            $table->text('item_code')->nullable();
             $table->decimal('quantity', 12, 2)->default(1.00);
-            $table->string('unit', 20)->default('個');
+            $table->text('unit')->default('個');
             $table->decimal('unit_price', 15, 2)->default(0.00);
             $table->decimal('line_amount', 15, 2)->default(0.00);
             $table->smallInteger('tax_rate')->default(10);

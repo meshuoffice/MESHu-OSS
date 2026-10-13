@@ -20,7 +20,7 @@
 
     <!-- エラー表示 -->
     @if ($errors->any())
-        <div class="alert alert-danger mx-auto mb-4 shadow-sm border-0" style="max-width: 860px;" role="alert">
+        <div class="alert alert-danger mb-4 shadow-sm border-0" role="alert">
             <h6 class="alert-heading fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に不備があります</h6>
             <ul class="mb-0 small ps-3">
                 @foreach ($errors->all() as $error)
@@ -31,7 +31,7 @@
     @endif
 
     <!-- 入力フォームカード -->
-    <div class="card card-custom bg-white mx-auto border-0 shadow-sm" style="max-width: 860px;">
+    <div class="card card-custom bg-white border-0 shadow-sm">
         <div class="card-header bg-light py-3 border-bottom d-flex justify-content-between align-items-center">
             <h5 class="m-0 fw-bold">配信お知らせ情報入力</h5>
             <span class="badge bg-secondary-subtle text-secondary">配信先: つながり承認企業のみ</span>
@@ -74,13 +74,13 @@
                     <label class="form-label fw-bold small text-secondary">公開ステータス <span class="badge bg-danger ms-1">必須</span></label>
                     <div class="d-flex gap-4">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="is_published" id="status_published" value="1" {{ old('is_published', $formData['is_published'] ?? '1') === '1' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="is_published" id="status_published" value="1" {{ old('is_published', $formData['is_published'] ?? '0') === '1' ? 'checked' : '' }}>
                             <label class="form-check-label fw-semibold" for="status_published">
                                 <span class="badge bg-success-subtle text-success me-1">公開</span> 保存後に配信・公開する
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="is_published" id="status_draft" value="0" {{ old('is_published', $formData['is_published'] ?? '') === '0' ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="is_published" id="status_draft" value="0" {{ old('is_published', $formData['is_published'] ?? '0') === '0' ? 'checked' : '' }}>
                             <label class="form-check-label fw-semibold" for="status_draft">
                                 <span class="badge bg-secondary-subtle text-secondary me-1">下書き</span> まだ配信・公開しない（後から編集・削除可能）
                             </label>

@@ -19,7 +19,7 @@
 </div>
 
     <!-- 確認カード -->
-    <div class="card card-custom bg-white mx-auto border-0 shadow-sm" style="max-width: 860px;">
+    <div class="card card-custom bg-white border-0 shadow-sm">
         <div class="card-header bg-light py-3 border-bottom d-flex justify-content-between align-items-center">
             <h5 class="m-0 fw-bold">以下の内容で登録・配信を確定します</h5>
             @if (($postData['is_published'] ?? '') === '1')

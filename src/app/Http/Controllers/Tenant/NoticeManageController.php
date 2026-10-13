@@ -121,7 +121,7 @@ class NoticeManageController extends Controller
         $formData = session('formData') ?? [
             'title'        => '',
             'content'      => '',
-            'is_published' => '1',
+            'is_published' => '0',
         ];
 
         return view('tenant.notice_manage.registration', [
@@ -403,21 +403,25 @@ class NoticeManageController extends Controller
     /**
      * 9. 完了画面表示
      */
-    public function complete(Request $request, int $id): View
+    public function complete(Request $request, ?int $id = null): View|RedirectResponse
     {
         $company = $this->authorizeAdmin();
         $user = Auth::guard('web')->user();
 
-        $notice = Notice::where('id', $id)
-            ->where('company_id', $company->id)
-            ->where('sender_type', 'company')
-            ->first();
+        $mode = $request->input('mode', session('mode', 'create'));
+        $successInfo = session('success_info');
 
-        if (!$notice) {
-            return view('tenant.notice_manage.index');
+        $notice = null;
+        if ($id) {
+            $notice = Notice::where('id', $id)
+                ->where('company_id', $company->id)
+                ->where('sender_type', 'company')
+                ->first();
         }
 
-        $mode = $request->input('mode', 'create');
+        if (!$notice && $mode !== 'delete' && !$successInfo) {
+            return redirect()->route('tenant.notice.manage.index');
+        }
 
         return view('tenant.notice_manage.complete', [
             'currentCompany' => $company,
@@ -427,6 +431,7 @@ class NoticeManageController extends Controller
             'activeMenu'     => 'settings',
             'notice'         => $notice,
             'mode'           => $mode,
+            'successInfo'    => $successInfo,
         ]);
     }
 
@@ -486,11 +491,13 @@ class NoticeManageController extends Controller
                 ->with('error', '公開中のお知らせは削除できません。下書きに変更してから削除してください。');
         }
 
+        $code = 'NT-' . str_pad((string)$id, 4, '0', STR_PAD_LEFT);
+        $title = $notice->title;
+
         NoticeAttachment::where('notice_id', $id)->delete();
         $notice->delete();
 
-        $code = 'NT-' . str_pad((string)$id, 4, '0', STR_PAD_LEFT);
-        return redirect()->route('tenant.notice.manage.index')
-            ->with('success', "下書きお知らせ（{$code}）を削除しました。");
+        return redirect()->route('tenant.notice.manage.complete', ['mode' => 'delete'])
+            ->with('success_info', "下書きお知らせ [ {$code} : {$title} ] を完全に削除いたしました。");
     }
 }

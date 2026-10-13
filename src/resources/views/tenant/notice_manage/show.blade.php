@@ -36,7 +36,7 @@
     </div>
 
     <!-- 詳細内容カード -->
-    <div class="card card-custom bg-white mx-auto border-0 shadow-sm" style="max-width: 860px;">
+    <div class="card card-custom bg-white border-0 shadow-sm">
         <div class="card-header bg-light py-3 border-bottom d-flex justify-content-between align-items-center">
             <h5 class="m-0 fw-bold">掲載情報詳細</h5>
             @if ($notice->is_published)

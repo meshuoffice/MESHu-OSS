@@ -232,7 +232,7 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/edit/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'edit'])->name('edit');
         Route::post('/confirm-update/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'confirmUpdate'])->name('confirm_update');
         Route::post('/update/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'update'])->name('update');
-        Route::get('/complete/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'complete'])->name('complete');
+        Route::get('/complete/{id?}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'complete'])->name('complete');
         Route::get('/delete/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'deleteConfirm'])->name('delete_confirm');
         Route::post('/delete/{id}', [\App\Http\Controllers\Tenant\NoticeManageController::class, 'destroy'])->name('delete');
     });

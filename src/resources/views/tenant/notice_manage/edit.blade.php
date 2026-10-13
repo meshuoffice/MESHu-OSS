@@ -21,7 +21,7 @@
 
     <!-- エラー表示 -->
     @if ($errors->any())
-        <div class="alert alert-danger mx-auto mb-4 shadow-sm border-0" style="max-width: 860px;" role="alert">
+        <div class="alert alert-danger mb-4 shadow-sm border-0" role="alert">
             <h6 class="alert-heading fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>入力内容に不備があります</h6>
             <ul class="mb-0 small ps-3">
                 @foreach ($errors->all() as $error)
@@ -32,7 +32,7 @@
     @endif
 
     <!-- 入力フォームカード -->
-    <div class="card card-custom bg-white mx-auto border-0 shadow-sm" style="max-width: 860px;">
+    <div class="card card-custom bg-white border-0 shadow-sm">
         <div class="card-header bg-light py-3 border-bottom d-flex justify-content-between align-items-center">
             <h5 class="m-0 fw-bold">お知らせ内容編集 (NT-{{ str_pad((string)$notice->id, 4, '0', STR_PAD_LEFT) }})</h5>
             <span class="badge bg-secondary-subtle text-secondary">配信先: つながり承認企業のみ</span>

@@ -3,7 +3,7 @@
 @section('title', 'お問い合わせ送信完了 - MESHu')
 
 @section('content')
-<div class="container p-4" style="max-width: 800px;">
+<div class="container p-4" style="max-width: 680px;">
     <div class="card card-custom bg-white p-5 text-center mt-4 shadow border-0">
         <div class="mb-4">
             <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle" style="width: 80px; height: 80px;">

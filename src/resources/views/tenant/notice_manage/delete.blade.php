@@ -19,7 +19,7 @@
 </div>
 
     <!-- 削除確認カード -->
-    <div class="card card-custom bg-white mx-auto border-0 shadow-sm" style="max-width: 760px;">
+    <div class="card card-custom bg-white border-0 shadow-sm">
         <div class="card-header bg-danger-subtle text-danger py-3 border-0 d-flex justify-content-between align-items-center">
             <h5 class="m-0 fw-bold"><i class="bi bi-exclamation-octagon me-2"></i>お知らせの削除</h5>
             <span class="badge bg-secondary-subtle text-secondary">ステータス: 下書き</span>
@@ -50,7 +50,9 @@
             <form action="{{ route('tenant.notice.manage.delete', $notice->id) }}" method="POST">
                 @csrf
                 <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                    <a href="{{ route('tenant.notice.manage.show', $notice->id) }}" class="btn btn-outline-secondary px-4">キャンセル</a>
+                    <a href="{{ route('tenant.notice.manage.show', $notice->id) }}" class="btn btn-outline-secondary px-4">
+                        <i class="bi bi-arrow-left me-1"></i>キャンセル
+                    </a>
                     <button type="submit" class="btn btn-danger px-4 fw-bold">
                         <i class="bi bi-trash me-1"></i>完全に削除する
                     </button>

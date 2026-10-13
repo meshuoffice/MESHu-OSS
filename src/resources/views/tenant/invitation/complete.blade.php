@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- 完了カード -->
-<div class="card border-0 shadow-sm text-center p-5 my-5 mx-auto" style="max-width: 700px;">
+<div class="card border-0 shadow-sm text-center p-5 my-5 mx-auto" style="max-width: 680px;">
     <div class="mb-4">
             <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
                 <i class="bi bi-check-lg fs-1"></i>

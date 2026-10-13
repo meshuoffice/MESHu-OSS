@@ -419,8 +419,16 @@ class NoticeManageTest extends TestCase
 
         // 削除実行
         $deleteRes = $this->actingAs($this->adminUserA, 'web')->post("/notice/manage/delete/{$notice->id}");
-        $deleteRes->assertRedirect(route('tenant.notice.manage.index'));
-        $deleteRes->assertSessionHas('success');
+        $deleteRes->assertRedirect(route('tenant.notice.manage.complete', ['mode' => 'delete']));
+        $deleteRes->assertSessionHas('success_info');
+
+        // 削除完了画面が表示できること
+        $completeRes = $this->actingAs($this->adminUserA, 'web')
+            ->withSession(['success_info' => '下書きお知らせを完全に削除いたしました。'])
+            ->get(route('tenant.notice.manage.complete', ['mode' => 'delete']));
+        $completeRes->assertStatus(200);
+        $completeRes->assertSee('お知らせを削除しました');
+        $completeRes->assertSee('下書きお知らせを完全に削除いたしました。');
 
         // DBから削除されていること（添付ファイル含む）
         $this->assertDatabaseMissing('notices', ['id' => $notice->id]);

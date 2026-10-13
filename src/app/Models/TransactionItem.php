@@ -14,22 +14,20 @@ class TransactionItem extends Model
         'line_no',
         'item_name',
         'item_code',
+        'spec',
         'quantity',
         'unit',
         'unit_price',
-        'line_amount',
-        'tax_rate',
-        'is_tax_free',
-        'remarks',
+        'amount',
     ];
 
     protected $casts = [
-        'line_no'     => 'integer',
-        'quantity'    => 'decimal:2',
-        'unit_price'  => 'decimal:2',
-        'line_amount' => 'decimal:2',
-        'tax_rate'    => 'integer',
-        'is_tax_free' => 'boolean',
+        'line_no'    => 'integer',
+        'quantity'   => 'decimal:2',
+        'unit_price' => 'decimal:2',
+        'amount'     => 'integer',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function transaction(): BelongsTo
