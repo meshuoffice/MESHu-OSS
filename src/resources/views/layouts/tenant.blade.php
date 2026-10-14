@@ -27,6 +27,7 @@ $activeMenu = $activeMenu ?? '';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{{ asset('assets_core/css/core_custom.css') }}">
     @yield('styles')
+    @stack('styles')
 </head>
 <body>
 
@@ -133,6 +134,21 @@ $activeMenu = $activeMenu ?? '';
                 </div>
             @endif
 
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span class="fw-bold">入力内容に誤りがあります。</span>
+                    </div>
+                    <ul class="mb-0 ps-3">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -153,5 +169,6 @@ $activeMenu = $activeMenu ?? '';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('assets_core/js/core_app.js') }}"></script>
     @yield('scripts')
+    @stack('scripts')
 </body>
 </html>

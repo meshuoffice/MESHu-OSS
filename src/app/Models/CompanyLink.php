@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class CompanyLink extends Model
 {
@@ -97,5 +98,87 @@ class CompanyLink extends Model
         }
         return null;
     }
-}
 
+    /**
+     * ユーザーのアクセス権限判定
+     */
+    public static function canUserAccessLink(int $linkId, int $companyId, ?int $assignedUserId = null): bool
+    {
+        $builder = DB::table('company_links as cl')
+            ->where('cl.id', $linkId)
+            ->where(function ($q) use ($companyId) {
+                $q->where('cl.buyer_company_id', $companyId)
+                  ->orWhere('cl.seller_company_id', $companyId);
+            });
+
+        if ($assignedUserId !== null) {
+            $builder->join('user_assigned_links as ual', 'ual.company_link_id', '=', 'cl.id')
+                    ->where('ual.user_id', $assignedUserId);
+        }
+
+        return $builder->count() > 0;
+    }
+
+    /**
+     * 連携企業一覧を取得
+     */
+    public static function getLinksForCompany(int $companyId, array $filters = [], ?int $assignedUserId = null): array
+    {
+        $builder = DB::table('company_links as cl')
+            ->select([
+                'cl.id as link_id',
+                'cl.buyer_company_id',
+                'cl.seller_company_id',
+                'cl.status as link_status',
+                'cl.created_at as link_created_at',
+                'cl.updated_at as link_updated_at',
+                DB::raw("CASE WHEN cl.buyer_company_id = {$companyId} THEN 'buyer' ELSE 'seller' END AS my_role"),
+                'partner.id as partner_company_id',
+                'partner.name as partner_name',
+                'partner.abbreviated_name as partner_abbreviated_name',
+                'partner.corporate_number as partner_corporate_number',
+                'partner.zip_code as partner_zip_code',
+                'partner.prefecture_code as partner_prefecture_code',
+                'partner.city as partner_city',
+                'partner.address as partner_address',
+                'partner.status as partner_company_status',
+                'cb.status as partner_badge_status',
+            ])
+            ->join('companies as partner', function ($join) use ($companyId) {
+                $join->on('partner.id', '=', DB::raw("CASE WHEN cl.buyer_company_id = {$companyId} THEN cl.seller_company_id ELSE cl.buyer_company_id END"));
+            })
+            ->leftJoin('company_badges as cb', 'cb.company_id', '=', 'partner.id')
+            ->where(function ($q) use ($companyId) {
+                $q->where('cl.buyer_company_id', $companyId)
+                  ->orWhere('cl.seller_company_id', $companyId);
+            })
+            ->where('partner.status', 'active');
+
+        if ($assignedUserId !== null) {
+            $builder->join('user_assigned_links as ual', 'ual.company_link_id', '=', 'cl.id')
+                    ->where('ual.user_id', $assignedUserId);
+        }
+
+        if (!empty($filters['my_role'])) {
+            if ($filters['my_role'] === 'buyer') {
+                $builder->where('cl.buyer_company_id', $companyId);
+            } elseif ($filters['my_role'] === 'seller') {
+                $builder->where('cl.seller_company_id', $companyId);
+            }
+        }
+
+        if (!empty($filters['status'])) {
+            $builder->where('cl.status', $filters['status']);
+        }
+
+        return $builder->orderByDesc('cl.updated_at')
+            ->get()
+            ->map(function ($item) {
+                $arr = (array)$item;
+                $prefName = Company::PREFECTURES[(int)($arr['partner_prefecture_code'] ?? 0)] ?? '';
+                $arr['partner_full_address'] = trim($prefName . ($arr['partner_city'] ?? '') . ($arr['partner_address'] ?? ''));
+                return $arr;
+            })
+            ->all();
+    }
+}

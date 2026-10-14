@@ -23,4 +23,12 @@ class UserAssignedLink extends Model
     {
         return $this->belongsTo(CompanyLink::class, 'company_link_id');
     }
+
+    /**
+     * link リレーション（companyLink のエイリアス）
+     */
+    public function link(): BelongsTo
+    {
+        return $this->companyLink();
+    }
 }

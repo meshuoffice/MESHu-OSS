@@ -29,12 +29,12 @@ class ProfileController extends Controller
         $assignedCompanies = [];
 
         if ((int)($user->is_all_assigned ?? 1) === 0) {
-            $assignedLinks = UserAssignedLink::with(['link.buyerCompany', 'link.sellerCompany'])
+            $assignedLinks = UserAssignedLink::with(['companyLink.buyerCompany', 'companyLink.sellerCompany'])
                 ->where('user_id', $user->id)
                 ->get();
 
             foreach ($assignedLinks as $assigned) {
-                $link = $assigned->link;
+                $link = $assigned->companyLink ?? $assigned->link;
                 if ($link) {
                     $partnerComp = ((int)$link->buyer_company_id === (int)$company->id)
                         ? $link->sellerCompany
