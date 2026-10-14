@@ -3,8 +3,13 @@
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Auth\UserPasswordResetController;
 use App\Http\Controllers\SignupController;
+use App\Http\Controllers\Tenant\BuyController;
+use App\Http\Controllers\Tenant\SellController;
+use App\Http\Controllers\Tenant\TransactionPrintController;
 use App\Models\Company;
 use App\Models\CompanyLink;
+use App\Models\Transaction;
+use App\Models\TransactionHistory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -127,6 +132,32 @@ Route::middleware(['auth:web'])->group(function () {
 
         $approvedLinkCount = $countQuery->count();
 
+        // 取引件数サマリー（購入・販売・担当絞り込み）
+        $txCounts = Transaction::getDashboardTransactionCounts($companyId, $assignedUserId);
+        // 今月の取引総額および前月比を取得（担当絞り込み）
+        $monthlyTxTotal = Transaction::getMonthlyTransactionTotal($companyId, $assignedUserId);
+        // 取引タスク一覧を取得（担当絞り込み）
+        $txTasks = Transaction::getPendingTasks($companyId, 5, $assignedUserId);
+        // 最近の取引アクティビティ一覧（最新5件・担当絞り込み）を取得
+        $recentActivities = TransactionHistory::getRecentActivitiesForCompany($companyId, 5, $assignedUserId);
+
+        // 管理者の場合、自社宛に届いている承認待ち連携申請を取得
+        $pendingLinkTasks = [];
+        if ($user->role === 'admin') {
+            $pendingLinkTasks = DB::table('company_links as cl')
+                ->select([
+                    'cl.id as link_id',
+                    'cl.created_at as link_created_at',
+                    'partner.name as partner_name',
+                ])
+                ->join('companies as partner', 'partner.id', '=', 'cl.buyer_company_id')
+                ->where('cl.seller_company_id', $companyId)
+                ->where('cl.status', 'pending')
+                ->get()
+                ->map(fn($item) => (array)$item)
+                ->all();
+        }
+
         // 最新のお知らせ（上位5件：重要固定優先）を取得
         $recentNotices = \App\Models\Notice::with(['company'])
             ->forCompany($companyId, $company->isAuthenticated())
@@ -144,6 +175,12 @@ Route::middleware(['auth:web'])->group(function () {
             'recentLinks'       => $recentLinks,
             'approvedLinkCount' => $approvedLinkCount,
             'recentNotices'     => $recentNotices,
+            'buyerTxCounts'     => $txCounts['buyer'],
+            'sellerTxCounts'    => $txCounts['seller'],
+            'monthlyTxTotal'    => $monthlyTxTotal,
+            'pendingLinkTasks'  => $pendingLinkTasks,
+            'pendingTxTasks'    => $txTasks,
+            'recentActivities'  => $recentActivities,
         ]);
     })->name('dashboard');
 
@@ -252,11 +289,62 @@ Route::middleware(['auth:web'])->group(function () {
         Route::post('/send', [\App\Http\Controllers\Tenant\ContactController::class, 'send'])->name('tenant.contact.send');
         Route::get('/complete', [\App\Http\Controllers\Tenant\ContactController::class, 'complete'])->name('tenant.contact.complete');
     });
+
+    // 購入ポータル (Buy) (mshdev 準拠: /buy)
+    Route::prefix('buy')->name('tenant.buy.')->group(function () {
+        Route::get('/', [BuyController::class, 'index'])->name('index');
+        Route::get('/detail/{id}', [BuyController::class, 'detail'])->name('detail');
+        Route::get('/estimate/new', [BuyController::class, 'newEstimate'])->name('estimate.new');
+        Route::post('/estimate/confirm', [BuyController::class, 'confirmEstimate'])->name('estimate.confirm');
+        Route::post('/estimate/create', [BuyController::class, 'createEstimate'])->name('estimate.create');
+        Route::get('/estimate/complete', [BuyController::class, 'completeEstimate'])->name('estimate.complete');
+        Route::get('/order/new', [BuyController::class, 'newDirectOrder'])->name('order.new');
+        Route::post('/order/confirm', [BuyController::class, 'confirmDirectOrder'])->name('order.confirm');
+        Route::post('/order/create', [BuyController::class, 'createDirectOrder'])->name('order.create');
+        Route::get('/order/complete', [BuyController::class, 'completeDirectOrder'])->name('order.complete');
+        Route::get('/order-confirm/{id}', [BuyController::class, 'confirmOrderFromEstimate'])->name('order_confirm_estimate');
+        Route::get('/order/estimate/{id}', [BuyController::class, 'confirmOrderFromEstimate']);
+        Route::post('/order-place/{id}', [BuyController::class, 'placeOrderFromEstimate'])->name('order_place_estimate');
+        Route::post('/order/estimate/{id}', [BuyController::class, 'placeOrderFromEstimate']);
+        Route::get('/order-complete/{id}', [BuyController::class, 'completeOrderFromEstimate'])->name('order_complete_estimate');
+        Route::post('/comment/{id}', [BuyController::class, 'postComment'])->name('comment');
+        Route::post('/comment/delete/{id}', [BuyController::class, 'deleteComment'])->name('comment.delete');
+        Route::get('/attachment/{id}', [BuyController::class, 'downloadAttachment'])->name('attachment');
+        Route::get('/print/{id}/{docType?}', [TransactionPrintController::class, 'print'])->name('print');
+    });
+
+    // 販売ポータル (Sell) (mshdev 準拠: /sell)
+    Route::prefix('sell')->name('tenant.sell.')->group(function () {
+        Route::get('/', [SellController::class, 'index'])->name('index');
+        Route::get('/detail/{id}', [SellController::class, 'detail'])->name('detail');
+        Route::get('/edit/{id}', [SellController::class, 'edit'])->name('edit');
+        Route::post('/edit/{id}', [SellController::class, 'saveEdit'])->name('save');
+        Route::post('/save/{id}', [SellController::class, 'saveEdit']);
+        Route::get('/reply/{id}', [SellController::class, 'replyConfirm'])->name('reply');
+        Route::post('/reply/{id}', [SellController::class, 'submitReply'])->name('submit_reply');
+        Route::get('/reply-complete/{id}', [SellController::class, 'completeReply'])->name('reply_complete');
+        Route::get('/order-accept/{id}', [SellController::class, 'acceptConfirm'])->name('order_accept');
+        Route::post('/order-accept/{id}', [SellController::class, 'acceptOrder'])->name('submit_order_accept');
+        Route::get('/order-accept-complete/{id}', [SellController::class, 'completeAccept'])->name('order_accept_complete');
+        Route::get('/estimate-decline/{id}', [SellController::class, 'declineEstimateConfirm'])->name('estimate_decline');
+        Route::post('/estimate-decline/{id}', [SellController::class, 'submitDeclineEstimate'])->name('submit_estimate_decline');
+        Route::get('/estimate-decline-complete/{id}', [SellController::class, 'completeDeclineEstimate'])->name('estimate_decline_complete');
+        Route::get('/order-decline/{id}', [SellController::class, 'declineOrderConfirm'])->name('order_decline');
+        Route::post('/order-decline/{id}', [SellController::class, 'submitDeclineOrder'])->name('submit_order_decline');
+        Route::get('/order-decline-complete/{id}', [SellController::class, 'completeDeclineOrder'])->name('order_decline_complete');
+        Route::post('/comment/{id}', [SellController::class, 'postComment'])->name('comment');
+        Route::post('/comment/delete/{id}', [SellController::class, 'deleteComment'])->name('comment.delete');
+        Route::get('/attachment/{id}', [SellController::class, 'downloadAttachment'])->name('attachment');
+        Route::get('/print/{id}/{docType?}', [TransactionPrintController::class, 'print'])->name('print');
+    });
+
+    // 帳票プレビュー共通 (transactions/print)
+    Route::get('/transactions/print/{id}/{docType?}', [TransactionPrintController::class, 'print'])->name('tenant.transactions.print');
 });
 
 
 // グローバルURLパラメータ制約（システム予約ルートや事務局ルートとの競合回避）
-Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|link|invitation|notice|profile|contact|logout|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
+Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|link|invitation|notice|profile|contact|logout|buy|sell|transactions|transaction|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
 
 
 // 5. 企業別ログイン・パスワード再設定ルート（/{url_code}）

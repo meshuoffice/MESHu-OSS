@@ -139,3 +139,32 @@ body {
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
 }
+
+/* ファイルドラッグ＆ドロップゾーン */
+.file-dropzone {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+.file-dropzone:hover {
+    border-color: #0d6efd;
+    background-color: #f0f7ff;
+}
+.file-dropzone.dragover {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+}
+.file-item-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    background-color: #e9ecef;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin: 0.25rem;
+}
