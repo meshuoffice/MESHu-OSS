@@ -1,0 +1,22 @@
+# ====================================================================
+# MESHu Git Attributes 設定
+# ====================================================================
+
+# 改行コード自動制御
+* text=auto eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# --------------------------------------------------------------------
+# OSS リリースパッケージ生成時の非公開ファイル除外設定 (export-ignore)
+# --------------------------------------------------------------------
+# 事務局（Admin）独自モジュール・機能
+/src/modules/Admin/ export-ignore
+/src/tests/Feature/Admin/ export-ignore
+/docs/specs/01_admin_management.md export-ignore
+
+# 開発用スクリプト・ローカル設定
+/docker/ export-ignore
+/scripts/ export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
