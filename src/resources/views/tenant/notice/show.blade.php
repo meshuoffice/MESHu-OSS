@@ -8,7 +8,7 @@
     <div>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-1">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ダッシュボード</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none">ホーム</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('tenant.notice.index') }}" class="text-decoration-none">お知らせ一覧</a></li>
                 <li class="breadcrumb-item active" aria-current="page">お知らせ詳細</li>
             </ol>

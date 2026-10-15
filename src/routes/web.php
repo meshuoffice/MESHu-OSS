@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\Auth\UserPasswordResetController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\Tenant\BuyController;
+use App\Http\Controllers\Tenant\ChatController;
 use App\Http\Controllers\Tenant\SellController;
 use App\Http\Controllers\Tenant\TransactionPrintController;
 use App\Models\Company;
@@ -340,11 +341,19 @@ Route::middleware(['auth:web'])->group(function () {
 
     // 帳票プレビュー共通 (transactions/print)
     Route::get('/transactions/print/{id}/{docType?}', [TransactionPrintController::class, 'print'])->name('tenant.transactions.print');
+
+    // チャット機能 (mshdev 準拠: /chat)
+    Route::prefix('chat')->name('tenant.chat.')->group(function () {
+        Route::get('/attachment/{attachment_id}', [ChatController::class, 'downloadAttachment'])->name('attachment');
+        Route::get('/{link_id?}', [ChatController::class, 'index'])->name('index');
+        Route::post('/{link_id}/message', [ChatController::class, 'sendMessage'])->name('send');
+        Route::post('/message/delete/{message_id}', [ChatController::class, 'deleteMessage'])->name('delete_message');
+    });
 });
 
 
 // グローバルURLパラメータ制約（システム予約ルートや事務局ルートとの競合回避）
-Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|link|invitation|notice|profile|contact|logout|buy|sell|transactions|transaction|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
+Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|link|invitation|notice|profile|contact|logout|buy|sell|transactions|transaction|chat|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
 
 
 // 5. 企業別ログイン・パスワード再設定ルート（/{url_code}）
