@@ -72,11 +72,15 @@ class ContactController extends Controller
         $contactType        = $request->input('contact_type');
         $subject            = trim((string)$request->input('subject'));
         $message            = trim((string)$request->input('message'));
-        $tempAttachmentPath = '';
-        $originalFileName   = '';
-        $tempFileMime       = '';
+        $existingData       = session('contact_form_data', []);
+        $tempAttachmentPath = $existingData['temp_attachment_path'] ?? '';
+        $originalFileName   = $existingData['original_file_name'] ?? '';
+        $tempFileMime       = $existingData['temp_file_mime'] ?? '';
 
         if ($request->hasFile('attachment') && $request->file('attachment')->isValid()) {
+            if (!empty($tempAttachmentPath) && Storage::disk('local')->exists($tempAttachmentPath)) {
+                Storage::disk('local')->delete($tempAttachmentPath);
+            }
             $file               = $request->file('attachment');
             $originalFileName   = $file->getClientOriginalName();
             $tempFileMime       = $file->getClientMimeType() ?: 'application/octet-stream';
@@ -131,8 +135,8 @@ class ContactController extends Controller
         $fullAttachmentPath = $hasAttachment ? Storage::disk('local')->path($tempAttachmentPath) : null;
 
         $contactTypeName = $this->contactTypes[$contactType] ?? 'その他';
-        $adminEmail      = config('mail.office_main', env('FIRST_OWNER_EMAIL', 'support@meshu.org'));
-        $officeSub       = config('mail.office_sub', env('EMAIL_OFFICE_SUB', null));
+        $adminEmail      = config('mail.office.main', env('MAIL_OFFICE_MAIN', env('FIRST_OWNER_EMAIL', 'support@meshu.org')));
+        $officeSub       = config('mail.office.sub', env('MAIL_OFFICE_SUB', null));
 
         // 1. 事務局宛て通知メール
         try {

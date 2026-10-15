@@ -30,7 +30,7 @@ class ContactInquiryMail extends Mailable
     {
         return new Envelope(
             subject: "【MESHuお問い合わせ】[{$this->contactTypeName}] {$this->contactSubject} ({$this->company->name})",
-            replyTo: [$this->user->email],
+            replyTo: [new \Illuminate\Mail\Mailables\Address($this->user->email, $this->user->user_name)],
         );
     }
 
