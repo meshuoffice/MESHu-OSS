@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\UserPasswordResetController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\Tenant\BuyController;
 use App\Http\Controllers\Tenant\ChatController;
+use App\Http\Controllers\Tenant\ManualController;
 use App\Http\Controllers\Tenant\SellController;
 use App\Http\Controllers\Tenant\TransactionPrintController;
 use App\Models\Company;
@@ -349,11 +350,20 @@ Route::middleware(['auth:web'])->group(function () {
         Route::post('/{link_id}/message', [ChatController::class, 'sendMessage'])->name('send');
         Route::post('/message/delete/{message_id}', [ChatController::class, 'deleteMessage'])->name('delete_message');
     });
+
+    // ヘルプ・操作マニュアル (mshdev 準拠・全社共通アクセス可能)
+    Route::prefix('manual')->name('tenant.manual.')->group(function () {
+        Route::get('/', [ManualController::class, 'index'])->name('index');
+        Route::get('/faq', [ManualController::class, 'faq'])->name('faq');
+        Route::get('/{category}', [ManualController::class, 'category'])->name('category');
+    });
+    Route::get('/help', fn () => redirect()->route('tenant.manual.index'))->name('tenant.help');
+    Route::get('/faq', fn () => redirect()->route('tenant.manual.faq'))->name('tenant.faq');
 });
 
 
 // グローバルURLパラメータ制約（システム予約ルートや事務局ルートとの競合回避）
-Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|link|invitation|notice|profile|contact|logout|buy|sell|transactions|transaction|chat|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
+Route::pattern('url_code', '^(?!(signup|dashboard|settings|users|link|invitation|notice|profile|contact|logout|buy|sell|transactions|transaction|chat|manual|faq|help|owntop|ownlogout|owncorp|ownnotice|owner|admin|up|api|own-.*)$)[a-zA-Z0-9_\-]+');
 
 
 // 5. 企業別ログイン・パスワード再設定ルート（/{url_code}）

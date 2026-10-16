@@ -58,6 +58,7 @@ $activeMenu = $activeMenu ?? '';
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                         <li><a class="dropdown-item" href="{{ url('/profile') }}"><i class="bi bi-person me-2"></i>マイプロフィール</a></li>
+                        <li><a class="dropdown-item" href="{{ route('tenant.manual.index') }}"><i class="bi bi-book me-2"></i>操作マニュアル</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="{{ route('logout') }}"><i class="bi bi-box-arrow-right me-2"></i>ログアウト</a></li>
                     </ul>
@@ -108,6 +109,10 @@ $activeMenu = $activeMenu ?? '';
             <a class="nav-link-custom {{ $activeMenu === 'contact' ? 'active' : '' }}" href="{{ url('/contact') }}">
                 <i class="bi bi-headset"></i>
                 <span>事務局へ問合せ</span>
+            </a>
+            <a class="nav-link-custom {{ $activeMenu === 'manual' ? 'active' : '' }}" href="{{ route('tenant.manual.index') }}">
+                <i class="bi bi-book-half"></i>
+                <span>操作マニュアル</span>
             </a>
             <hr class="mx-3 my-2 text-muted">
             <a class="nav-link-custom text-danger" href="{{ route('logout') }}">
