@@ -145,7 +145,7 @@
                         @elseif ($currentCategory['id'] === 'company-users')
                             @if ($sec['id'] === 'cu-company')
                                 <a href="{{ url('/settings/company') }}" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-building me-1"></i> 自社情報管理を開く
+                                    <i class="bi bi-building me-1"></i> 企業情報メンテナンスを開く
                                 </a>
                             @else
                                 <a href="{{ route('tenant.users.index') }}" class="btn btn-outline-primary btn-sm">

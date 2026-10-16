@@ -186,9 +186,9 @@ class ManualTest extends TestCase
         $catResponse->assertSee('見積依頼を経由せずに、直接発注');
 
         // キーワード検索
-        $searchResponse = $this->actingAs($this->user, 'web')->get('/manual/faq?q=インボイス');
+        $searchResponse = $this->actingAs($this->user, 'web')->get('/manual/faq?q=電話番号');
         $searchResponse->assertStatus(200);
-        $searchResponse->assertSee('適格請求書発行事業者登録番号');
+        $searchResponse->assertSee('自社の住所や電話番号');
     }
 
     /**
