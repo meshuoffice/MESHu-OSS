@@ -202,20 +202,20 @@
                 お問い合わせの前に、以下のサポート情報で解決できる場合がございます。
             </p>
             <div class="list-group list-group-flush border-top border-bottom mb-3">
-                <a href="#" class="list-group-item list-group-item-action py-3 px-0 d-flex justify-content-between align-items-center">
+                <a href="{{ route('tenant.manual.faq') }}#faq-link-pending" class="list-group-item list-group-item-action py-3 px-0 d-flex justify-content-between align-items-center">
                     <span class="small fw-semibold text-dark"><i class="bi bi-question-circle me-2 text-muted"></i>取引先連携の承認待ちが続く場合</span>
                     <i class="bi bi-chevron-right text-muted small"></i>
                 </a>
-                <a href="#" class="list-group-item list-group-item-action py-3 px-0 d-flex justify-content-between align-items-center">
+                <a href="{{ route('tenant.manual.faq') }}#faq-employee-assignment" class="list-group-item list-group-item-action py-3 px-0 d-flex justify-content-between align-items-center">
                     <span class="small fw-semibold text-dark"><i class="bi bi-question-circle me-2 text-muted"></i>従業員の担当割当の変更手順</span>
                     <i class="bi bi-chevron-right text-muted small"></i>
                 </a>
-                <a href="#" class="list-group-item list-group-item-action py-3 px-0 d-flex justify-content-between align-items-center">
+                <a href="{{ route('tenant.manual.faq') }}#faq-notification-mail" class="list-group-item list-group-item-action py-3 px-0 d-flex justify-content-between align-items-center">
                     <span class="small fw-semibold text-dark"><i class="bi bi-question-circle me-2 text-muted"></i>通知メールが届かない場合の確認</span>
                     <i class="bi bi-chevron-right text-muted small"></i>
                 </a>
             </div>
-            <a href="#" class="btn btn-outline-primary btn-sm w-100 fw-semibold">
+            <a href="{{ route('tenant.manual.index') }}" class="btn btn-outline-primary btn-sm w-100 fw-semibold">
                 ヘルプ・操作マニュアルを見る <i class="bi bi-box-arrow-up-right ms-1"></i>
             </a>
         </div>

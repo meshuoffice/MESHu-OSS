@@ -58,7 +58,8 @@ class AdminCompanyController extends Controller
             $query->where(function ($q) use ($keyword) {
                 $q->where('companies.name', 'like', "%{$keyword}%")
                     ->orWhere('companies.url_code', 'like', "%{$keyword}%")
-                    ->orWhere('companies.corporate_number', 'like', "%{$keyword}%");
+                    ->orWhere('companies.corporate_number', 'like', "%{$keyword}%")
+                    ->orWhere('companies.invoice_number', 'like', "%{$keyword}%");
             });
         }
 
@@ -174,6 +175,8 @@ class AdminCompanyController extends Controller
                 'alpha_dash',
                 $isEdit ? "unique:companies,url_code,{$companyId}" : 'unique:companies,url_code',
             ],
+            'corporate_number' => ['nullable', 'string', 'digits:13'],
+            'invoice_number'   => ['nullable', 'string', 'regex:/^T\d{13}$/i'],
         ];
 
         $messages = [
@@ -191,6 +194,8 @@ class AdminCompanyController extends Controller
             'url_code.required'         => 'URL識別コードは必須項目です。',
             'url_code.alpha_dash'       => 'URL識別コードは半角英数字、ダッシュ(-)、アンダースコア(_)のみ使用できます。',
             'url_code.unique'           => '指定されたURL識別コードは既に使用されています。',
+            'corporate_number.digits'   => '法人番号は13桁の半角数字で入力してください。',
+            'invoice_number.regex'      => '適格請求書登録番号はTから始まる14桁の半角英数字（例：T1234567890123）で入力してください。',
         ];
 
         if (!$isEdit) {
@@ -243,6 +248,7 @@ class AdminCompanyController extends Controller
             'abbreviated_kana' => $postData['abbreviated_kana'],
             'sub_name'         => $postData['sub_name'] ?? null,
             'corporate_number' => $postData['corporate_number'] ?? null,
+            'invoice_number'   => !empty($postData['invoice_number']) ? strtoupper(trim($postData['invoice_number'])) : null,
             'url_code'         => $postData['url_code'],
             'zip_code'         => $postData['zip_code'],
             'prefecture_code'  => (int)$postData['prefecture_code'],

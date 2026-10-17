@@ -207,7 +207,7 @@
                 <p>生命の営みに準拠した網目構造のB2Bプラットフォーム</p>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 MESHu. All rights reserved.</p>
+                <p>&copy; 2026{{ date('Y') > 2026 ? '-' . date('Y') : '' }} MESHu. All rights reserved.</p>
             </div>
         </div>
     </footer>

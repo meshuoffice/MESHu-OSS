@@ -290,7 +290,9 @@
                             @if ($issuer && !empty($issuer->tel))
                                 TEL: {{ $issuer->tel }}<br>
                             @endif
-                            @if ($issuer && !empty($issuer->corporate_number))
+                            @if ($issuer && !empty($issuer->invoice_number))
+                                登録番号: {{ $issuer->invoice_number }}<br>
+                            @elseif ($issuer && !empty($issuer->corporate_number))
                                 登録番号: T{{ $issuer->corporate_number }}<br>
                             @endif
                         </div>

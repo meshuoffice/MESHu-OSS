@@ -23,7 +23,7 @@
             <a href="{{ route('dashboard') }}" class="btn btn-primary px-4 fw-semibold">
                 <i class="bi bi-grid-1x2-fill me-2"></i>ダッシュボードへ戻る
             </a>
-            <a href="{{ route('tenant.contact') }}" class="btn btn-outline-secondary px-4 fw-semibold">
+            <a href="{{ route('tenant.manual.index') }}" class="btn btn-outline-secondary px-4 fw-semibold">
                 <i class="bi bi-question-circle me-2"></i>ヘルプ・FAQを見る
             </a>
         </div>

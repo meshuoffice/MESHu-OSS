@@ -54,6 +54,13 @@ class ChatController extends Controller
             return false;
         }
 
+        // 相手先企業が active（稼働中）であること（退会・停止時はアクセス不可）
+        $partnerId = (int)$link->buyer_company_id === $companyId ? (int)$link->seller_company_id : (int)$link->buyer_company_id;
+        $partner = \App\Models\Company::find($partnerId);
+        if (!$partner || $partner->status !== 'active') {
+            return false;
+        }
+
         // 全担当フラグON または 管理者の場合はアクセス可能
         if ($user->role === 'admin' || (int)$user->is_all_assigned === 1) {
             return true;

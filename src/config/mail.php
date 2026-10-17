@@ -60,8 +60,9 @@ return [
     */
 
     'office' => [
-        'main' => env('MAIL_OFFICE_MAIN', 'noreply@meshu.org'),
-        'sub'  => env('MAIL_OFFICE_SUB', 'lamusicar@gmail.com'),
+        'main'  => env('MAIL_OFFICE_MAIN', 'noreply@meshu.org'),
+        'sub'   => env('MAIL_OFFICE_SUB', 'lamusicar@gmail.com'),
+        'reply' => env('MAIL_OFFICE_REPLY', 'officem@meshu.org'),
     ],
 
 ];

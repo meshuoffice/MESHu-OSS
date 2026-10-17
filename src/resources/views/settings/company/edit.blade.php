@@ -17,21 +17,6 @@
     </div>
 </div>
 
-<!-- エラー表示メッセージ -->
-@if ($errors->any())
-    <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-        <div>
-            <strong>入力内容にエラーがあります。</strong> 下記の項目をご確認ください。
-            <ul class="mb-0 mt-1 small">
-                @foreach ($errors->all() as $err)
-                    <li>{{ $err }}</li>
-                @endforeach
-            </ul>
-        </div>
-    </div>
-@endif
-
 <!-- 編集フォーム -->
 <div class="card card-custom bg-white shadow-sm">
     <div class="card-header bg-white py-3 border-bottom">
@@ -63,7 +48,7 @@
             </div>
 
             <div class="row g-3 mb-4">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label for="abbreviated_kana" class="form-label fw-semibold text-dark">企業名カナ <span class="badge bg-danger ms-1" style="font-size: 0.75rem;">必須</span></label>
                     <input type="text" class="form-control @error('abbreviated_kana') is-invalid @enderror" id="abbreviated_kana" name="abbreviated_kana" value="{{ old('abbreviated_kana', $company->abbreviated_kana) }}" required placeholder="例：カブシキガイシャサンプルネクスト">
                     @error('abbreviated_kana')
@@ -71,13 +56,21 @@
                     @enderror
                     <div class="form-text text-muted">全角カナで入力してください。</div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label for="corporate_number" class="form-label fw-semibold text-dark">法人番号 <span class="badge bg-secondary-subtle text-secondary ms-1" style="font-size: 0.75rem;">任意</span></label>
                     <input type="text" class="form-control font-monospace @error('corporate_number') is-invalid @enderror" id="corporate_number" name="corporate_number" value="{{ old('corporate_number', $company->corporate_number) }}" placeholder="例：1234567890123" maxlength="13">
                     @error('corporate_number')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                     <div class="form-text text-muted">半角数字13桁で入力してください。</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="invoice_number" class="form-label fw-semibold text-dark">適格請求書登録番号 (T番号) <span class="badge bg-secondary-subtle text-secondary ms-1" style="font-size: 0.75rem;">任意</span></label>
+                    <input type="text" class="form-control font-monospace @error('invoice_number') is-invalid @enderror" id="invoice_number" name="invoice_number" value="{{ old('invoice_number', $company->invoice_number) }}" placeholder="例：T1234567890123" maxlength="14">
+                    @error('invoice_number')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <div class="form-text text-muted">T＋半角数字13桁（帳票に印字されます）。</div>
                 </div>
             </div>
 
@@ -206,6 +199,25 @@
         </form>
     </div>
 </div>
+
+<!-- 危険ゾーン（退会手続き）: 管理者のみ表示 -->
+@if (Auth::user() && Auth::user()->role === 'admin')
+    <div class="card border-danger-subtle bg-white mt-5 shadow-sm">
+        <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h5 class="text-danger fw-bold mb-1">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>MESHuの退会手続き
+                </h5>
+                <p class="text-muted small mb-0">
+                    自社企業のアカウントを一時停止し、MESHuプラットフォームからの退会申請を行います。
+                </p>
+            </div>
+            <a href="{{ route('tenant.company.withdraw', ['url_code' => $company->url_code]) }}" class="btn btn-outline-danger px-3 fw-semibold">
+                退会手続きへ進む <i class="bi bi-chevron-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+@endif
 @endsection
 
 @section('scripts')

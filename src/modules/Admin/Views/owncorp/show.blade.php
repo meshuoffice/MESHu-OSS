@@ -99,6 +99,10 @@
                 <td class="font-monospace">{{ $company->corporate_number ?? '-' }}</td>
             </tr>
             <tr>
+                <th class="bg-light text-muted w-25 small fw-bold">適格請求書登録番号</th>
+                <td class="font-monospace">{{ $company->invoice_number ?? '-' }}</td>
+            </tr>
+            <tr>
                 <th class="bg-light text-muted w-25 small fw-bold">電話番号</th>
                 <td class="font-monospace">{{ $company->tel ?? '-' }}</td>
             </tr>
