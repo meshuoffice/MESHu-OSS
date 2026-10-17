@@ -274,6 +274,7 @@ class CompanySettingsTest extends TestCase
             'abbreviated_kana' => 'キギョウエーコウシン',
             'url_code'         => 'company-a-new',
             'corporate_number' => '9876543210123',
+            'invoice_number'   => 'T9876543210123',
             'tel'              => '03-9999-0000',
             'homepage'         => 'https://new.company-a.com',
             'zip_code'         => '102-0082',
@@ -296,6 +297,8 @@ class CompanySettingsTest extends TestCase
             'id'               => $this->companyA->id,
             'name'             => '株式会社企業A 確定更新',
             'url_code'         => 'company-a-new',
+            'corporate_number' => '9876543210123',
+            'invoice_number'   => 'T9876543210123',
             'tel'              => '03-9999-0000',
             'tax_rate'         => 8,
             'amount_rounding'  => 'ceil',
@@ -330,8 +333,7 @@ class CompanySettingsTest extends TestCase
         $followResponse = $this->followRedirects($response);
         $followResponse->assertStatus(200);
         $followResponse->assertSee('alert-danger');
-        $followResponse->assertSee('入力内容にエラーがあります。');
-        $followResponse->assertSee('下記の項目をご確認ください。');
+        $followResponse->assertSee('入力内容に誤りがあります。');
     }
 }
 

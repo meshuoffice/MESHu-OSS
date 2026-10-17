@@ -53,6 +53,7 @@
     <input type="hidden" name="abbreviated_kana" value="{{ $postData['abbreviated_kana'] }}">
     <input type="hidden" name="url_code" value="{{ $postData['url_code'] }}">
     <input type="hidden" name="corporate_number" value="{{ $postData['corporate_number'] ?? '' }}">
+    <input type="hidden" name="invoice_number" value="{{ $postData['invoice_number'] ?? '' }}">
     <input type="hidden" name="tel" value="{{ $postData['tel'] }}">
     <input type="hidden" name="homepage" value="{{ $postData['homepage'] ?? '' }}">
     <input type="hidden" name="zip_code" value="{{ $postData['zip_code'] }}">
@@ -107,6 +108,14 @@
                 <div class="col-md-3 confirm-label">法人番号</div>
                 <div class="col-md-9">
                     <div class="confirm-value font-monospace">{{ $postData['corporate_number'] ?: '未設定' }}</div>
+                </div>
+            </div>
+
+            <!-- 適格請求書登録番号 -->
+            <div class="row align-items-center mb-3">
+                <div class="col-md-3 confirm-label">適格請求書登録番号</div>
+                <div class="col-md-9">
+                    <div class="confirm-value font-monospace">{{ !empty($postData['invoice_number']) ? strtoupper($postData['invoice_number']) : '未設定' }}</div>
                 </div>
             </div>
 

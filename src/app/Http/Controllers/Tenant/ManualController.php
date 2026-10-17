@@ -155,8 +155,8 @@ class ManualController extends Controller
                     [
                         'id' => 'cu-company',
                         'title' => '1. 企業情報のメンテナンス',
-                        'content' => '「各種設定」>「企業情報メンテナンス」から、企業名、略称、代表者名、所在地（郵便番号・都道府県・市区町村・住所）、電話番号、FAX番号、ウェブサイトURL等を変更できます。',
-                        'tips' => '企業情報を更新すると、自社専用ログイン画面や発行・印刷される見積書・注文書の社名・連絡先表示に自動反映されます。',
+                        'content' => '「各種設定」>「企業情報メンテナンス」から、企業名、略称、代表者名、適格請求書発行事業者登録番号（T番号）、所在地（郵便番号・都道府県・市区町村・住所）、電話番号、FAX番号、ウェブサイトURL等を変更できます。画面最下部には管理者専用の「退会手続き」エリアも設置されています。',
+                        'tips' => 'インボイスの適格請求書発行事業者登録番号（T番号）を設定すると、発行・印刷される見積書・注文書に登録番号として自動記載されます。また、退会手続きでは取引先への影響や電帳法に基づくデータ保存を確認の上、30日間の猶予期間をもって申請が行われます。',
                     ],
                     [
                         'id' => 'cu-users',
@@ -257,6 +257,24 @@ class ManualController extends Controller
                 'related_section' => 'cu-company',
             ],
             [
+                'id' => 'faq-invoice-number',
+                'category' => 'company-users',
+                'category_title' => '帳票・インボイス',
+                'question' => 'インボイス制度に対応するため、帳票（見積書・注文書）に自社の適格請求書発行事業者登録番号（T番号）を記載したいです。',
+                'answer' => '管理者アカウントで「各種設定」>「企業情報メンテナンス」を開き、「適格請求書登録番号 (T番号)」欄に「T1234567890123」のようにT＋13桁の番号を入力して保存してください。以降発行・印刷される全帳票にインボイス登録番号として自動反映されます。',
+                'related_manual' => 'company-users',
+                'related_section' => 'cu-company',
+            ],
+            [
+                'id' => 'faq-company-withdraw',
+                'category' => 'company-users',
+                'category_title' => '企業退会・利用停止',
+                'question' => 'MESHuを退会するにはどのような手続きが必要ですか？',
+                'answer' => '管理者アカウントでログインし、「各種設定」>「企業情報メンテナンス」画面下部の「退会手続きへ進む」から申請を行います。取引先への影響や電帳法に基づく帳票ダウンロードの確認等、5項目の同意事項にチェックしパスワードを入力して実行します。退会後は即座にアカウントが一時停止となり、30日間の猶予期間後に完全削除されます。誤操作による復旧は退会通知メールへの返信にてお問い合わせいただけます。',
+                'related_manual' => 'company-users',
+                'related_section' => 'cu-company',
+            ],
+            [
                 'id' => 'faq-cancel-transaction',
                 'category' => 'transactions',
                 'category_title' => '取引管理',
@@ -321,7 +339,8 @@ class ManualController extends Controller
             // FAQからの検索
             foreach ($faqList as $faq) {
                 if (str_contains(mb_strtolower($faq['question']), $keywordLower) ||
-                    str_contains(mb_strtolower($faq['answer']), $keywordLower)) {
+                    str_contains(mb_strtolower($faq['answer']), $keywordLower) ||
+                    str_contains(mb_strtolower($faq['category_title'] ?? ''), $keywordLower)) {
                     $searchResults[] = [
                         'type' => 'faq',
                         'category_id' => $faq['category'],
@@ -384,7 +403,8 @@ class ManualController extends Controller
             $keywordLower = mb_strtolower($keyword);
             $filteredFaqs = array_filter($filteredFaqs, function ($faq) use ($keywordLower) {
                 return str_contains(mb_strtolower($faq['question']), $keywordLower) ||
-                       str_contains(mb_strtolower($faq['answer']), $keywordLower);
+                       str_contains(mb_strtolower($faq['answer']), $keywordLower) ||
+                       str_contains(mb_strtolower($faq['category_title'] ?? ''), $keywordLower);
             });
         }
 

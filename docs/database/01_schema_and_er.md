@@ -54,6 +54,7 @@ erDiagram
         int invitation_company_id "招待元企業ID"
         text url_code UK "専用ログインURL識別子"
         varchar corporate_number "法人番号(13桁)"
+        varchar(14) invoice_number "適格請求書発行事業者登録番号(T+13桁)"
         text name "企業名"
         text abbreviated_name "法人名略称"
         text abbreviated_kana "法人名カナ"
@@ -337,6 +338,7 @@ CREATE TYPE notice_target_scope_enum AS ENUM ('all', 'verified', 'unverified');
 | `invitation_company_id` | INT | YES | NULL | 招待経由登録時の招待元企業ID |
 | `url_code` | TEXT | NO | - | 専用ログインURL識別子（英数字・ハイフン） |
 | `corporate_number` | VARCHAR(13) | YES | NULL | 法人番号（13桁数字） |
+| `invoice_number` | VARCHAR(14) | YES | NULL | 適格請求書発行事業者登録番号（T＋13桁） |
 | `name` | TEXT | NO | - | 正式企業名 |
 | `abbreviated_name` | TEXT | YES | NULL | 法人名略称 |
 | `abbreviated_kana` | TEXT | YES | NULL | 法人名カナ略称 |

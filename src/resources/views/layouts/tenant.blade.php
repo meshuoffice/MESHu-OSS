@@ -167,7 +167,7 @@ $activeMenu = $activeMenu ?? '';
 
     <!-- フッター -->
     <footer class="text-center py-3 text-muted small border-top bg-white">
-        &copy; 2026 MESHu Platform. All rights reserved.
+        &copy; 2026{{ date('Y') > 2026 ? '-' . date('Y') : '' }} MESHu Platform. All rights reserved.
     </footer>
 
     <!-- Bootstrap 5 JS Bundle (CDN) -->

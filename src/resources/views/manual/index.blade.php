@@ -13,13 +13,13 @@
     </nav>
 
     <!-- ヒーロー・検索エリア -->
-    <div class="card card-custom border-0 shadow-sm bg-gradient text-white mb-5" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+    <div class="card border-0 shadow rounded-4 text-white mb-5 overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%) !important;">
         <div class="card-body p-4 p-md-5 text-center">
-            <span class="badge bg-white text-primary fw-bold px-3 py-2 mb-3 rounded-pill">
-                <i class="bi bi-book-half me-1"></i> MESHu ガイド＆サポート
+            <span class="badge bg-white text-dark fw-bold px-3 py-2 mb-3 rounded-pill shadow-sm">
+                <i class="bi bi-book-half text-primary me-1"></i> MESHu ガイド＆サポート
             </span>
-            <h1 class="h2 fw-bold text-white mb-3">MESHu ヘルプ・操作マニュアル</h1>
-            <p class="text-light lead mx-auto mb-4" style="max-width: 680px; opacity: 0.95;">
+            <h1 class="h2 fw-bold mb-3" style="color: #ffffff !important; text-shadow: 0 2px 4px rgba(0,0,0,0.4);">MESHu ヘルプ・操作マニュアル</h1>
+            <p class="lead mx-auto mb-4" style="color: #e2e8f0 !important; max-width: 680px; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
                 企業間取引、つながり連携、チャット、各種設定の手順やよくある質問をご確認いただけます。
             </p>
 

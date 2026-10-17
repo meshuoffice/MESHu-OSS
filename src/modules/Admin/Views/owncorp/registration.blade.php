@@ -80,6 +80,11 @@
                     @if ($errors->has('corporate_number'))<div class="invalid-feedback">{{ $errors->first('corporate_number') }}</div>@endif
                 </div>
                 <div class="col-12 col-md-6">
+                    <label for="invoice_number" class="form-label small fw-bold">適格請求書登録番号 (T番号)</label>
+                    <input type="text" name="invoice_number" class="form-control font-monospace {{ $errors->has('invoice_number') ? 'is-invalid' : '' }}" id="invoice_number" placeholder="例: T1234567890123" maxlength="14" value="{{ old('invoice_number', $formData['invoice_number'] ?? '') }}">
+                    @if ($errors->has('invoice_number'))<div class="invalid-feedback">{{ $errors->first('invoice_number') }}</div>@endif
+                </div>
+                <div class="col-12 col-md-6">
                     <label for="tel" class="form-label small fw-bold">電話番号 <span class="text-danger">*</span></label>
                     <input type="tel" name="tel" class="form-control font-monospace {{ $errors->has('tel') ? 'is-invalid' : '' }}" id="tel" placeholder="03-1234-5678" required value="{{ old('tel', $formData['tel'] ?? '') }}">
                     @if ($errors->has('tel'))<div class="invalid-feedback">{{ $errors->first('tel') }}</div>@endif

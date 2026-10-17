@@ -175,7 +175,7 @@
 
     <!-- フッター -->
     <footer class="py-3 text-center border-top bg-white" style="border-top: 1px solid var(--color-border); padding: 1.5rem 0; text-align: center; background-color: #ffffff;">
-        <p style="color: var(--color-text-muted); font-size: 0.85rem; margin: 0;">&copy; 2026 MESHu Platform. All rights reserved.</p>
+        <p style="color: var(--color-text-muted); font-size: 0.85rem; margin: 0;">&copy; 2026{{ date('Y') > 2026 ? '-' . date('Y') : '' }} MESHu Platform. All rights reserved.</p>
     </footer>
 
 </body>

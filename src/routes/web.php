@@ -35,6 +35,9 @@ Route::prefix('signup')->group(function () {
     Route::post('/register', [SignupController::class, 'register'])->name('signup.register');
 });
 
+// 退会受付完了画面（公開ページ）
+Route::get('/withdraw/complete', [\App\Http\Controllers\Tenant\CompanyWithdrawController::class, 'complete'])->name('withdraw.complete');
+
 
 // 3. ユーザー企業向けポータル（ログイン後共通ルート：auth:web 保護）
 Route::middleware(['auth:web'])->group(function () {
@@ -197,6 +200,12 @@ Route::middleware(['auth:web'])->group(function () {
         Route::get('/complete', [\App\Http\Controllers\Tenant\CompanyController::class, 'complete'])->name('tenant.company.complete');
     });
 
+    // 自社退会手続き（/{url_code}/settings/company/withdraw）
+    Route::prefix('{url_code}/settings/company/withdraw')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Tenant\CompanyWithdrawController::class, 'showForm'])->name('tenant.company.withdraw');
+        Route::post('/', [\App\Http\Controllers\Tenant\CompanyWithdrawController::class, 'withdraw'])->name('tenant.company.withdraw.process');
+    });
+
     // 自社従業員管理（mshdev 準拠: /users）
     Route::prefix('users')->name('tenant.users.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Tenant\UserController::class, 'index'])->name('index');
@@ -239,6 +248,10 @@ Route::middleware(['auth:web'])->group(function () {
     Route::get('/company', function () {
         $user = Auth::guard('web')->user();
         return redirect()->route('tenant.company.edit', ['url_code' => $user->company->url_code]);
+    });
+    Route::get('/settings/company/withdraw', function () {
+        $user = Auth::guard('web')->user();
+        return redirect()->route('tenant.company.withdraw', ['url_code' => $user->company->url_code]);
     });
 
     // マイプロフィール

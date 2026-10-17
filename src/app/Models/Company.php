@@ -26,6 +26,7 @@ class Company extends Model
         'invitation_company_id',
         'url_code',
         'corporate_number',
+        'invoice_number',
         'name',
         'abbreviated_name',
         'abbreviated_kana',

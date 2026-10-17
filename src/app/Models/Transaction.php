@@ -222,6 +222,8 @@ class Transaction extends Model
                     ->join('companies as partner', 'partner.id', '=', 'cl.buyer_company_id');
         }
 
+        $builder->where('partner.status', 'active');
+
         $builder->leftJoin('company_badges as cb', 'cb.company_id', '=', 'partner.id');
 
         // ステータスフィルター
@@ -290,6 +292,7 @@ class Transaction extends Model
             ->join('companies as partner', function ($join) use ($myCompanyId) {
                 $join->on('partner.id', '=', DB::raw("CASE WHEN cl.buyer_company_id = {$myCompanyId} THEN cl.seller_company_id ELSE cl.buyer_company_id END"));
             })
+            ->where('partner.status', 'active')
             ->leftJoin('company_badges as cb', 'cb.company_id', '=', 'partner.id');
 
         if ($assignedUserId !== null) {
@@ -320,7 +323,11 @@ class Transaction extends Model
     public static function canAccess(int $transactionId, int $myCompanyId, ?int $assignedUserId = null): bool
     {
         $builder = DB::table('transactions as t')
-            ->join('company_links as cl', 'cl.id', '=', 't.company_link_id');
+            ->join('company_links as cl', 'cl.id', '=', 't.company_link_id')
+            ->join('companies as partner', function ($join) use ($myCompanyId) {
+                $join->on('partner.id', '=', DB::raw("CASE WHEN cl.buyer_company_id = {$myCompanyId} THEN cl.seller_company_id ELSE cl.buyer_company_id END"));
+            })
+            ->where('partner.status', 'active');
 
         if ($assignedUserId !== null) {
             $builder->join('user_assigned_links as ual', 'ual.company_link_id', '=', 'cl.id')
@@ -341,10 +348,12 @@ class Transaction extends Model
      */
     public static function getDashboardTransactionCounts(int $myCompanyId, ?int $assignedUserId = null): array
     {
-        // 1. 買手（購入）側
+        // 1. 買手（購入）側（相手売手企業が active なもののみ）
         $buyerBuilder = DB::table('transactions as t')
             ->select('t.status', DB::raw('COUNT(*) as cnt'))
-            ->join('company_links as cl', 'cl.id', '=', 't.company_link_id');
+            ->join('company_links as cl', 'cl.id', '=', 't.company_link_id')
+            ->join('companies as partner', 'partner.id', '=', 'cl.seller_company_id')
+            ->where('partner.status', 'active');
 
         if ($assignedUserId !== null) {
             $buyerBuilder->join('user_assigned_links as ual', 'ual.company_link_id', '=', 'cl.id')
@@ -365,10 +374,12 @@ class Transaction extends Model
         $buyerOrderPlaced     = $buyerCounts['order_placed'] ?? 0;
         $buyerTotalProgress   = $buyerEstimateRequest + $buyerEstimateReplied + $buyerOrderPlaced;
 
-        // 2. 売手（販売）側
+        // 2. 売手（販売）側（相手買手企業が active なもののみ）
         $sellerBuilder = DB::table('transactions as t')
             ->select('t.status', DB::raw('COUNT(*) as cnt'))
-            ->join('company_links as cl', 'cl.id', '=', 't.company_link_id');
+            ->join('company_links as cl', 'cl.id', '=', 't.company_link_id')
+            ->join('companies as partner', 'partner.id', '=', 'cl.buyer_company_id')
+            ->where('partner.status', 'active');
 
         if ($assignedUserId !== null) {
             $sellerBuilder->join('user_assigned_links as ual', 'ual.company_link_id', '=', 'cl.id')
