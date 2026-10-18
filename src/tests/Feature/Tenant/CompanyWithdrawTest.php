@@ -258,11 +258,13 @@ class CompanyWithdrawTest extends TestCase
             'withdrawn_admin_email' => 'withdraw-admin@test.com',
         ])->get('/withdraw/complete');
 
+        $expectedReply = config('mail.office.reply', env('MAIL_OFFICE_REPLY', 'officem@meshu.org'));
+
         $response->assertStatus(200);
         $response->assertSee('退会申請を受け付けました');
         $response->assertSee('退会テスト株式会社');
         $response->assertSee('30日間はデータ保持期間');
-        $response->assertSee('officem@meshu.org');
+        $response->assertSee($expectedReply);
     }
 
     /**
