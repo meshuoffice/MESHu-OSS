@@ -138,7 +138,8 @@ class SignupTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('新規申請企業株式会社');
 
-        // 2. 登録実行
+        // 2. 登録実行（本番仕様 suspended として明示的に検証）
+        \Illuminate\Support\Facades\Config::set('meshu.company_initial_status', 'suspended');
         $response = $this->withSession(['signup_data' => $signupData])
                          ->post('/signup/register');
 
