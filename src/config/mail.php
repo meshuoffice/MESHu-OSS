@@ -49,20 +49,20 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'noreply@meshu.org'),
+        'address' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
         'name'    => env('MAIL_FROM_NAME', 'MESHu運営事務局'),
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | 事務局用通知メールアドレス (Office Main / Sub)
+    | 事務局用通知メールアドレス (Office Main / Sub / Reply)
     |--------------------------------------------------------------------------
     */
 
     'office' => [
-        'main'  => env('MAIL_OFFICE_MAIN', 'noreply@meshu.org'),
-        'sub'   => env('MAIL_OFFICE_SUB', 'lamusicar@gmail.com'),
-        'reply' => env('MAIL_OFFICE_REPLY', 'officem@meshu.org'),
+        'main'  => env('MAIL_OFFICE_MAIN', 'office-main@example.com'),
+        'sub'   => env('MAIL_OFFICE_SUB', null),
+        'reply' => env('MAIL_OFFICE_REPLY', 'office-reply@example.com'),
     ],
 
 ];

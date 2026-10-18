@@ -135,8 +135,8 @@ class ContactController extends Controller
         $fullAttachmentPath = $hasAttachment ? Storage::disk('local')->path($tempAttachmentPath) : null;
 
         $contactTypeName = $this->contactTypes[$contactType] ?? 'その他';
-        $adminEmail      = config('mail.office.main', env('MAIL_OFFICE_MAIN', env('FIRST_OWNER_EMAIL', 'support@meshu.org')));
-        $officeSub       = config('mail.office.sub', env('MAIL_OFFICE_SUB', null));
+        $adminEmail      = config('mail.office.main');
+        $officeSub       = config('mail.office.sub');
 
         // 1. 事務局宛て通知メール
         try {

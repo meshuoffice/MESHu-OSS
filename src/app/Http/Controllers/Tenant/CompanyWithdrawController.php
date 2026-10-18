@@ -128,7 +128,7 @@ class CompanyWithdrawController extends Controller
             ->whereNotIn('status', ['order_accepted', 'estimate_declined', 'order_declined'])
             ->count();
 
-            $officeMain = config('mail.office.main', 'noreply@meshu.org');
+            $officeMain = config('mail.office.main');
             $officeSub  = config('mail.office.sub');
 
             $officeMail = Mail::to($officeMain);
@@ -166,7 +166,7 @@ class CompanyWithdrawController extends Controller
         return view('settings.company.withdraw_complete', [
             'companyName' => session('withdrawn_company_name'),
             'adminEmail'  => session('withdrawn_admin_email'),
-            'replyEmail'  => config('mail.office.reply', env('MAIL_OFFICE_REPLY', 'officem@meshu.org')),
+            'replyEmail'  => config('mail.office.reply'),
         ]);
     }
 }

@@ -214,8 +214,8 @@ class ContactTest extends TestCase
         $sendResponse->assertRedirect(route('tenant.contact.complete'));
 
         // 3. メール配信の検証
-        $expectedAdminEmail = config('mail.office.main', env('MAIL_OFFICE_MAIN', env('FIRST_OWNER_EMAIL', 'support@meshu.org')));
-        $expectedOfficeSub  = config('mail.office.sub', env('MAIL_OFFICE_SUB', null));
+        $expectedAdminEmail = config('mail.office.main');
+        $expectedOfficeSub  = config('mail.office.sub');
 
         Mail::assertSent(ContactInquiryMail::class, function ($mail) use ($expectedAdminEmail, $expectedOfficeSub) {
             $isToCorrect  = $mail->hasTo($expectedAdminEmail);

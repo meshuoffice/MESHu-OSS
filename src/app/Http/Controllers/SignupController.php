@@ -227,7 +227,7 @@ class SignupController extends Controller
                 ));
 
                 // 事務局宛て通知メール（Main宛て、SubをBCC指定）
-                $officeMain = config('mail.office.main', 'noreply@meshu.org');
+                $officeMain = config('mail.office.main');
                 $officeSub  = config('mail.office.sub');
 
                 $adminMail = Mail::to($officeMain);

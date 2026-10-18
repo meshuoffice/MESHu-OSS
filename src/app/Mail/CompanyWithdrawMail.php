@@ -22,7 +22,7 @@ class CompanyWithdrawMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $replyEmail = config('mail.office.reply', env('MAIL_OFFICE_REPLY', 'officem@meshu.org'));
+        $replyEmail = config('mail.office.reply');
 
         return new Envelope(
             subject: '【MESHu】退会申請受付完了のお知らせ（30日間の保持期間について）',
@@ -37,7 +37,7 @@ class CompanyWithdrawMail extends Mailable
             with: [
                 'company'    => $this->company,
                 'user'       => $this->user,
-                'replyEmail' => config('mail.office.reply', env('MAIL_OFFICE_REPLY', 'officem@meshu.org')),
+                'replyEmail' => config('mail.office.reply'),
             ],
         );
     }

@@ -225,7 +225,7 @@ class CompanyWithdrawTest extends TestCase
 
         // 管理者へ退会通知メールが送信され、Reply-ToがMAIL_OFFICE_REPLYであること
         Mail::assertSent(CompanyWithdrawMail::class, function (CompanyWithdrawMail $mail) {
-            $expectedReply = config('mail.office.reply', env('MAIL_OFFICE_REPLY', 'officem@meshu.org'));
+            $expectedReply = config('mail.office.reply');
             $hasTo = $mail->hasTo('withdraw-admin@test.com');
             $hasReply = $mail->hasReplyTo($expectedReply) ||
                 collect($mail->envelope()->replyTo)->contains(fn($a) => $a->address === $expectedReply);
@@ -234,7 +234,7 @@ class CompanyWithdrawTest extends TestCase
 
         // 事務局へ退会通知メールが送信されていること（Main宛て、SubはBCC）
         Mail::assertSent(AdminCompanyWithdrawNotificationMail::class, function (AdminCompanyWithdrawNotificationMail $mail) {
-            $expectedOfficeMain = config('mail.office.main', 'noreply@meshu.org');
+            $expectedOfficeMain = config('mail.office.main');
             $expectedOfficeSub  = config('mail.office.sub');
 
             $matchesTo = $mail->hasTo($expectedOfficeMain);
