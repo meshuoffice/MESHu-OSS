@@ -83,12 +83,13 @@ class TestCompanySeeder extends Seeder
         );
 
         // 3. 売手企業にMESHu認証済みバッジを付与（署名付き）
+        $firstOwnerId = \Illuminate\Support\Facades\DB::table('owners')->value('id') ?? 1;
         \App\Models\CompanyBadge::firstOrCreate(
             ['company_id' => $sellerCompany->id],
             [
-                'verifier_owner_id' => null,
+                'verifier_owner_id' => $firstOwnerId,
                 'status'            => 'active',
-                'signature'         => hash('sha256', "MESHu:Badge:{$sellerCompany->id}:0:demo-seed"),
+                'signature'         => hash('sha256', "MESHu:Badge:{$sellerCompany->id}:{$firstOwnerId}:demo-seed"),
             ]
         );
 
