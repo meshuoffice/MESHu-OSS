@@ -8,7 +8,7 @@
 <p align="center">
   <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3"></a>
   <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php" alt="PHP Version"></a>
-  <a href="https://laravel.com/"><img src="https://img.shields.io/badge/Laravel-11.x-FF2D20?logo=laravel" alt="Laravel Version"></a>
+  <a href="https://laravel.com/"><img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?logo=laravel" alt="Laravel Version"></a>
   <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-16%2B-336791?logo=postgresql" alt="PostgreSQL"></a>
 </p>
 
