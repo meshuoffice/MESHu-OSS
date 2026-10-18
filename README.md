@@ -6,6 +6,13 @@
 </p>
 
 <p align="center">
+  <a href="https://www.gnu.org/licenses/agpl-3.0"><img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3"></a>
+  <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php" alt="PHP Version"></a>
+  <a href="https://laravel.com/"><img src="https://img.shields.io/badge/Laravel-11.x-FF2D20?logo=laravel" alt="Laravel Version"></a>
+  <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-16%2B-336791?logo=postgresql" alt="PostgreSQL"></a>
+</p>
+
+<p align="center">
   <a href="#-プロジェクト理念-the-meshu-philosophy">プロジェクト理念</a> •
   <a href="#-主な機能">機能一覧</a> •
   <a href="#-クイックスタート-docker">クイックスタート</a> •
@@ -28,9 +35,9 @@ MESHu は、特定の営利企業が取引データを私物化したり独占�
 MESHu は、将来的には参加企業や業界団体が共同で管理・相互監視する **非営利の技術コンソーシアム（一般社団法人等）** による運営を志向しています（ドメインに `.org` を採用している理由もここにあります）。
 誰か1社の恣意的な判断でルールが変えられたり、サービスが打ち切られることのない、永続的で中立な取引基盤を提供します。
 
-### 3. 「利益配当をせず、すべてをセキュリティと堅牢性に再投資する」
+### 3. 「健全な運営体制を維持し、余剰金はセキュリティと堅牢性へ積極投資」
 MESHu は株主配当や役員報酬のための利益追求を行いません。
-プラットフォームの維持分担金や賛助金として得られた資金は、**100% セキュリティ対策（WAF多重防御、第三者機関による侵入診断、改ざん防止監査ログ、暗号化、災害対策）へ再投資** されます。
+プラットフォームの維持分担金や賛助金として得られた資金は、**健全で持続可能な運営・保守体制の維持を最優先としつつ、余剰金は積極的にセキュリティ対策（WAF多重防御、第三者機関による侵入診断、改ざん防止監査ログ、暗号化、災害対策）へ再投資** されます。
 利益を削ってセキュリティを妥協する商業ツールとは一線を画す、圧倒的な堅牢性を実現します。
 
 ---
@@ -38,10 +45,10 @@ MESHu は株主配当や役員報酬のための利益追求を行いません�
 ## 🌟 主な機能
 
 - 🤝 **つながり管理 (Company Links)**: 取引先企業の検索、連携申請・承認、担当者ごとの権限割当
-- 📑 **取引管理 (Transactions)**: 見積依頼、見積回答、注文、受注承諾、端数処理・消費税計算、各種帳票ブラウザ印刷（A4対応）
+- 📑 **取引管理 (Transactions)**: 見積依頼、見積回答、注文、受注承諾、適格請求書（インボイス）対応、端数処理・消費税計算、各種帳票ブラウザ印刷（A4対応）
 - 💬 **企業間チャット (Chats)**: 取引先との1対1リアルタイムメッセージ、ファイル添付（最大20MB）、既読管理、厳格な担当者振り分け通知メール
 - 📢 **お知らせ機能 (Notices)**: 事務局連絡、取引先発信業務連絡、自社お知らせ配信管理
-- ✉️ **事務局お問い合わせ (Contact)**: 3ステップ入力、添付ファイル一時保持、事務局メイン/サブ/ユーザーへの自動返信
+- 📚 **マニュアル・ヘルプ (Manual & Help)**: システム操作マニュアル、FAQ（よくある質問）、企業退会申請・データ保護フロー
 - 🏢 **マルチテナント企業認証**: 企業専用URL（`/{url_code}/login`）、SHA-256トークンによるセキュアなパスワード再設定
 
 ---
@@ -66,6 +73,15 @@ docker exec meshu-laravel-app php artisan migrate --seed
 # ・ポータル画面: http://localhost:8080
 # ・メール確認用 Mailpit: http://localhost:8025
 ```
+
+### 🔑 すぐに試せる初期デモアカウント
+
+初期Seeder（`php artisan migrate --seed`）を実行すると、以下のテスト用企業アカウントが即座に利用可能となります。両社間には最初から「承認済みつながり（Link）」が確立されており、見積・受発注・チャットの相互送受信を即座に体験できます。
+
+| 企業種別 | 企業名 | 専用ログインURL | メールアドレス（ID） | 初期パスワード | 特徴 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **買手企業** | 株式会社サンプル商事 | [http://localhost:8080/sample-buyer/login](http://localhost:8080/sample-buyer/login) | `admin@buyer.example.com` | `Secret1234!` | 買手管理者（発注側） |
+| **売手企業** | 株式会社テスト販売 | [http://localhost:8080/sample-seller/login](http://localhost:8080/sample-seller/login) | `admin@seller.example.com` | `Secret1234!` | 売手管理者・**MESHu認証バッジ付与済み** |
 
 ---
 
@@ -106,4 +122,5 @@ MESHu プロジェクトでは、**「中立で安全なB2B取引の未来」** 
 
 ## 📜 ライセンス
 
-本ソフトウェアは [MIT License](LICENSE) のもとで公開されています。
+本ソフトウェアは [GNU Affero General Public License v3 (AGPL-3.0)](LICENSE) のもとで公開されています。
+

@@ -54,19 +54,34 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        <h1 class="complete-title">アカウント登録申請を受け付けました</h1>
+                        <h1 class="complete-title">
+                            @if (!empty($isImmediatelyActive))
+                                アカウント登録が完了しました
+                            @else
+                                アカウント登録申請を受け付けました
+                            @endif
+                        </h1>
                         
                         <p class="complete-text">
                             ご登録ありがとうございます。<br>
-                            管理者メールアドレス（<strong>{{ $email }}</strong>）宛てに、自動生成された仮パスワードなどを記載した受付確認メールをお送りしました。<br>
+                            管理者メールアドレス（<strong>{{ $email }}</strong>）宛てに、自動生成された仮パスワードなどを記載した確認メールをお送りしました。<br>
                             <br>
-                            <strong>【重要】現在アカウントは「停止中（承認待ち）」です。</strong><br>
-                            ただいま事務局にて企業の実在確認（審査）を行っております。<br>
-                            承認が完了し、アカウントが活性化されましたらログインしてご利用いただけるようになります。承認完了のお知らせメールが届くまで今ばらくお待ちください。
+                            @if (!empty($isImmediatelyActive))
+                                アカウントは<strong>即時有効化（活性化）</strong>されています。<br>
+                                下記ボタンまたは専用URLより、仮パスワードを用いてすぐにログインしてご利用いただけます。
+                            @else
+                                <strong>【重要】現在アカウントは「停止中（承認待ち）」です。</strong><br>
+                                ただいま事務局にて企業の実在確認（審査）を行っております。<br>
+                                承認が完了し、アカウントが活性化されましたらログインしてご利用いただけるようになります。承認完了のお知らせメールが届くまで今ばらくお待ちください。
+                            @endif
                         </p>
 
                         <div class="form-buttons">
-                            <a href="{{ url('/') }}" class="btn btn-primary btn-lg">トップページへ戻る</a>
+                            @if (!empty($isImmediatelyActive) && !empty($url_code))
+                                <a href="{{ url('/' . $url_code . '/login') }}" class="btn btn-primary btn-lg">専用ログイン画面へ進む</a>
+                            @else
+                                <a href="{{ url('/') }}" class="btn btn-primary btn-lg">トップページへ戻る</a>
+                            @endif
                         </div>
                     </div>
                 </div>
