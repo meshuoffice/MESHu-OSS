@@ -81,5 +81,26 @@ class TestCompanySeeder extends Seeder
                 'is_all_assigned' => 0,
             ]
         );
+
+        // 3. 売手企業にMESHu認証済みバッジを付与（署名付き）
+        \App\Models\CompanyBadge::firstOrCreate(
+            ['company_id' => $sellerCompany->id],
+            [
+                'verifier_owner_id' => null,
+                'status'            => 'active',
+                'signature'         => hash('sha256', "MESHu:Badge:{$sellerCompany->id}:0:demo-seed"),
+            ]
+        );
+
+        // 4. 買手企業と売手企業の「承認済みつながり（Link）」を初期確立
+        \App\Models\CompanyLink::firstOrCreate(
+            [
+                'buyer_company_id'  => $buyerCompany->id,
+                'seller_company_id' => $sellerCompany->id,
+            ],
+            [
+                'status' => 'approved',
+            ]
+        );
     }
 }

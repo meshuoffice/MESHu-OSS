@@ -157,9 +157,12 @@ class SignupController extends Controller
         $invitationCode = $signupData['invitation_code'] ?? null;
         $invitation = $invitationCode ? Invitation::where('invitation_code', $invitationCode)->first() : null;
 
+        $initialStatus = config('meshu.company_initial_status', 'suspended');
+        $isImmediatelyActive = ($initialStatus === 'active');
+
         try {
-            DB::transaction(function () use ($signupData, $urlCode, $rawPassword, $prefectureCode, $invitation) {
-                // 企業登録（初期状態は審査待ち suspended）
+            DB::transaction(function () use ($signupData, $urlCode, $rawPassword, $prefectureCode, $invitation, $initialStatus) {
+                // 企業登録（設定に応じた初期ステータス：本番は suspended、OSS等は active）
                 $company = Company::create([
                     'parent_id'             => null,
                     'invitation_company_id' => $invitation ? $invitation->company_id : null,
@@ -173,7 +176,7 @@ class SignupController extends Controller
                     'city'                  => $signupData['city'],
                     'address'               => $signupData['address'],
                     'tel'                   => $signupData['phone'],
-                    'status'                => 'suspended',
+                    'status'                => $initialStatus,
                 ]);
 
                 // 初期管理者登録（is_all_assignedはPostgreSQLデフォルト: 1[全担当]に委任）
@@ -215,20 +218,21 @@ class SignupController extends Controller
             try {
                 // 登録者宛て受付メール
                 Mail::to($signupData['adminEmail'])->send(new WelcomeSignupMail(
-                    companyName: $signupData['companyName'],
-                    userName:    $signupData['adminName'],
-                    urlCode:     $urlCode,
-                    rawPassword: $rawPassword,
-                    email:       $signupData['adminEmail']
+                    companyName:         $signupData['companyName'],
+                    userName:            $signupData['adminName'],
+                    urlCode:             $urlCode,
+                    rawPassword:         $rawPassword,
+                    email:               $signupData['adminEmail'],
+                    isImmediatelyActive: $isImmediatelyActive
                 ));
 
-                // 事務局宛て通知メール（Main宛て、SubをCC指定）
+                // 事務局宛て通知メール（Main宛て、SubをBCC指定）
                 $officeMain = config('mail.office.main', 'noreply@meshu.org');
                 $officeSub  = config('mail.office.sub');
 
                 $adminMail = Mail::to($officeMain);
                 if ($officeSub && $officeSub !== $officeMain) {
-                    $adminMail->cc($officeSub);
+                    $adminMail->bcc($officeSub);
                 }
                 $adminMail->send(new AdminSignupNotificationMail(
                     signupData: $signupData,
@@ -243,8 +247,9 @@ class SignupController extends Controller
             session()->forget('signup_data');
 
             return view('signup.complete', [
-                'email'    => $signupData['adminEmail'],
-                'url_code' => $urlCode,
+                'email'               => $signupData['adminEmail'],
+                'url_code'            => $urlCode,
+                'isImmediatelyActive' => $isImmediatelyActive,
             ]);
 
         } catch (\Exception $e) {
