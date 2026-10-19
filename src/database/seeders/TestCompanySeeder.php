@@ -44,7 +44,6 @@ class TestCompanySeeder extends Seeder
                 'position'        => '部長',
                 'role'            => 'admin',
                 'status'          => 'active',
-                'is_all_assigned' => 0,
             ]
         );
 
@@ -78,7 +77,6 @@ class TestCompanySeeder extends Seeder
                 'position'        => '課長',
                 'role'            => 'admin',
                 'status'          => 'active',
-                'is_all_assigned' => 0,
             ]
         );
 
