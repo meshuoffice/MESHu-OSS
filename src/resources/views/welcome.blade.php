@@ -206,6 +206,15 @@
                 <span class="logo-text">MESH<span class="logo-accent">u</span></span>
                 <p>生命の営みに準拠した網目構造のB2Bプラットフォーム</p>
             </div>
+            <div class="footer-links" style="display: flex; gap: 1.5rem; align-items: center;">
+                <a href="https://meshu.org" style="color: #94a3b8; text-decoration: none; font-size: 0.875rem;">公式サイト</a>
+                <a href="https://x.com/meshu_org" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: none; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    公式 𝕏 (@meshu_org)
+                </a>
+            </div>
             <div class="footer-bottom">
                 <p>&copy; 2026{{ date('Y') > 2026 ? '-' . date('Y') : '' }} MESHu. All rights reserved.</p>
             </div>

@@ -18,7 +18,8 @@
   <a href="#-クイックスタート-docker">クイックスタート</a> •
   <a href="#-セキュリティへのコミットメント">セキュリティ</a> •
   <a href="#-賛同企業パートナーの募集">パートナー募集</a> •
-  <a href="./docs/README.md">ドキュメント</a>
+  <a href="./docs/README.md">ドキュメント</a> •
+  <a href="https://x.com/meshu_org">公式 𝕏 (@meshu_org)</a>
 </p>
 
 ---
@@ -115,7 +116,7 @@ MESHu プロジェクトでは、**「中立で安全なB2B取引の未来」** 
 3. **オープンソース・コントリビューター**:
    セキュリティ向上、機能改善、ドキュメント整備などに知恵と技術を貸していただけるエンジニア。
 
-ご興味をお持ちいただけましたら、GitHub の Issue / Discussions または公式サイトのお問い合わせ窓口よりお気軽にお声がけください。
+ご興味をお持ちいただけましたら、GitHub の Issue / Discussions、公式 𝕏 ([@meshu_org](https://x.com/meshu_org)) の DM、または公式サイト（[meshu.org](https://meshu.org)）のお問い合わせ窓口よりお気軽にお声がけください。
 
 ---
 
