@@ -62,14 +62,24 @@ Docker がインストールされた環境であれば、以下のコマンド�
 git clone https://github.com/meshuoffice/MESHu-OSS.git
 cd MESHu-OSS
 
-# 2. コンテナのビルド・起動 (Nginx, PHP 8.2, PostgreSQL 16, Mailpit)
+# 2. 環境変数設定ファイルの配置
+cp src/.env.example src/.env
+
+# 3. コンテナのビルド・起動 (Nginx, PHP 8.2, PostgreSQL 16, Mailpit)
 docker compose up -d
 
-# 3. 依存ライブラリのインストール & マイグレーション & 初期データ投入
+# 4. 依存ライブラリのインストール ＆ 暗号化キー生成
 docker exec meshu-laravel-app composer install
+docker exec meshu-laravel-app php artisan key:generate
+
+# 5. マイグレーション ＆ 初期デモデータ（買手・売手・認証バッジ）投入
 docker exec meshu-laravel-app php artisan migrate --seed
 
-# 4. ブラウザでアクセス
+# 6. ストレージ権限の設定（キャッシュ・セッション用）
+docker exec meshu-laravel-app mkdir -p storage/framework/cache/data storage/framework/views storage/framework/sessions storage/logs bootstrap/cache
+docker exec meshu-laravel-app chmod -R 777 storage bootstrap/cache
+
+# 7. ブラウザでアクセス
 # ・ポータル画面: http://localhost:8080
 # ・メール確認用 Mailpit: http://localhost:8025
 ```
