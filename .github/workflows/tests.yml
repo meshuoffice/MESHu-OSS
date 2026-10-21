@@ -53,8 +53,6 @@ jobs:
       - name: Prepare Testing Environment
         working-directory: src
         env:
-          APP_ENV: testing
-          APP_KEY: base64:8mP9+0K9/b8k7w3E2wX5mY9+8K0b6L8vP3wX5mY9+8K=
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
           DB_PORT: 5432
@@ -63,14 +61,14 @@ jobs:
           DB_PASSWORD: password
           ADMIN_URL_PATH: admin
         run: |
+          cp .env.example .env
+          php artisan key:generate
           php artisan config:clear
           php artisan migrate --force
 
       - name: Run Tests
         working-directory: src
         env:
-          APP_ENV: testing
-          APP_KEY: base64:8mP9+0K9/b8k7w3E2wX5mY9+8K0b6L8vP3wX5mY9+8K=
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
           DB_PORT: 5432
