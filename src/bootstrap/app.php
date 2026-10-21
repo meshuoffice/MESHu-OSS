@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // リバースプロキシ（Nginx / ALB / Cloudflare等）背後での HTTPS 判定を有効化
+        $middleware->trustProxies(at: '*');
+
         $aliases = [
             'tenant' => CompanyTenant::class,
         ];
