@@ -29,7 +29,11 @@ Route::get('/', function () {
 
 // 公式技術白書 (White Paper)
 Route::get('/whitepaper', function () {
-    return response()->file(public_path('whitepaper/index.html'), [
+    $path = public_path('whitepaper/index.html');
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return response(file_get_contents($path), 200, [
         'Content-Type' => 'text/html; charset=UTF-8',
     ]);
 })->name('whitepaper');
