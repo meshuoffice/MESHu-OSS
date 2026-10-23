@@ -25,6 +25,7 @@
             <nav class="nav">
                 <a href="#concept" class="nav-link">コンセプト</a>
                 <a href="#features" class="nav-link">機能・仕様</a>
+                <a href="/whitepaper" class="nav-link">技術白書</a>
                 <a href="#contact" class="nav-link">お問い合わせ</a>
             </nav>
             <div class="header-actions">
@@ -206,8 +207,10 @@
                 <span class="logo-text">MESH<span class="logo-accent">u</span></span>
                 <p>生命の営みに準拠した網目構造のB2Bプラットフォーム</p>
             </div>
-            <div class="footer-links" style="display: flex; gap: 1.5rem; align-items: center;">
+            <div class="footer-links" style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
                 <a href="https://meshu.org" style="color: #94a3b8; text-decoration: none; font-size: 0.875rem;">公式サイト</a>
+                <a href="/whitepaper" style="color: #94a3b8; text-decoration: none; font-size: 0.875rem;">技術白書 (White Paper)</a>
+                <a href="https://github.com/meshuoffice/MESHu-OSS" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: none; font-size: 0.875rem;">GitHub (OSS)</a>
                 <a href="https://x.com/meshu_org" target="_blank" rel="noopener noreferrer" style="color: #94a3b8; text-decoration: none; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.35rem;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>

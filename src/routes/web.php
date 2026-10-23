@@ -27,6 +27,14 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// 公式技術白書 (White Paper)
+Route::get('/whitepaper', function () {
+    return response()->file(public_path('whitepaper/index.html'), [
+        'Content-Type' => 'text/html; charset=UTF-8',
+    ]);
+})->name('whitepaper');
+
+
 
 // 2. アカウント新規登録（Signup）ルート
 Route::prefix('signup')->group(function () {
