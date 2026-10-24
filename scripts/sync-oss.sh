@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 # ====================================================================
 # MESHu OSS 公開用ブランチ自動生成・同期スクリプト (Bash)
 #
@@ -37,6 +37,8 @@ EXCLUDE_PATHS=(
     "src/modules/Admin"
     "src/tests/Feature/Admin"
     "docs/specs/01_admin_management.md"
+    "src/public/google8fd9a5a1846fc1bd.html"
+    "src/public/google*.html"
 )
 
 for path in "${EXCLUDE_PATHS[@]}"; do

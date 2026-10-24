@@ -1,4 +1,4 @@
-# ====================================================================
+﻿# ====================================================================
 # MESHu OSS 公開用ブランチ自動生成・同期スクリプト (PowerShell)
 # 
 # 目的:
@@ -43,7 +43,9 @@ try {
     $excludePaths = @(
         "src/modules/Admin",
         "src/tests/Feature/Admin",
-        "docs/specs/01_admin_management.md"
+        "docs/specs/01_admin_management.md",
+        "src/public/google8fd9a5a1846fc1bd.html",
+        "src/public/google*.html"
     )
 
     foreach ($path in $excludePaths) {
