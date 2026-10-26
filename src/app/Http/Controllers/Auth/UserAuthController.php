@@ -66,6 +66,9 @@ class UserAuthController extends Controller
         Auth::guard('web')->login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
+        // 最終ログイン日時を記録
+        $user->update(['last_login_at' => now()]);
+
         // セッション補助情報を保持 (CI4互換)
         session([
             'user_id'          => $user->id,

@@ -114,6 +114,10 @@
             </div>
         </div>
         <div class="row align-items-center mb-3">
+            <div class="col-md-3 detail-label">最終ログイン日時</div>
+            <div class="col-md-9"><div class="detail-value font-monospace">{{ $targetUser->last_login_at ? $targetUser->last_login_at->format('Y-m-d H:i:s') : '未ログイン' }}</div></div>
+        </div>
+        <div class="row align-items-center mb-3">
             <div class="col-md-3 detail-label">登録日時</div>
             <div class="col-md-9"><div class="detail-value font-monospace">{{ $targetUser->created_at ? $targetUser->created_at->format('Y-m-d H:i:s') : '-' }}</div></div>
         </div>
