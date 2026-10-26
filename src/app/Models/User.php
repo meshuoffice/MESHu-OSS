@@ -23,6 +23,7 @@ class User extends Authenticatable
         'position',
         'role',
         'status',
+        'last_login_at',
         'is_all_assigned',
         'notify_trade',
         'notify_comment',
@@ -39,6 +40,7 @@ class User extends Authenticatable
         'notify_trade'    => 'boolean',
         'notify_comment'  => 'boolean',
         'notify_chat'     => 'boolean',
+        'last_login_at'   => 'datetime',
         'created_at'      => 'datetime',
         'updated_at'      => 'datetime',
     ];

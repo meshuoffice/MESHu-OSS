@@ -89,6 +89,8 @@ class TenantAuthTest extends TestCase
             'is_all_assigned' => 0,
         ]);
 
+        $this->assertNull($user->last_login_at);
+
         $response = $this->post('/login-test-corp/login', [
             'email'    => 'user@test-corp.com',
             'password' => 'CorrectPassword123',
@@ -96,6 +98,7 @@ class TenantAuthTest extends TestCase
 
         $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($user, 'web');
+        $this->assertNotNull($user->fresh()->last_login_at);
     }
 
     /**

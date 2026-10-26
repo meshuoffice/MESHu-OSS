@@ -54,6 +54,9 @@ class AdminAuthController extends Controller
 
             $request->session()->regenerate();
 
+            // 最終ログイン日時を記録
+            $owner->update(['last_login_at' => now()]);
+
             return redirect()->intended(route('admin.dashboard'));
         }
 

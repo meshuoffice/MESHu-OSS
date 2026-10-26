@@ -217,11 +217,12 @@
                         <th>所属 / 役職</th>
                         <th>社内権限</th>
                         <th>状態</th>
+                        <th>最終ログイン</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if ($users->isEmpty())
-                        <tr><td colspan="6" class="text-center text-muted py-2">登録ユーザーなし</td></tr>
+                        <tr><td colspan="7" class="text-center text-muted py-2">登録ユーザーなし</td></tr>
                     @else
                         @foreach ($users as $u)
                             <tr>
@@ -243,6 +244,7 @@
                                         <span class="badge bg-secondary">{{ $u->status }}</span>
                                     @endif
                                 </td>
+                                <td class="font-monospace small">{{ $u->last_login_at ? $u->last_login_at->format('Y-m-d H:i') : '-' }}</td>
                             </tr>
                         @endforeach
                     @endif

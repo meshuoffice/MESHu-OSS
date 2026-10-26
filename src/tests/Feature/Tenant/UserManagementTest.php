@@ -126,6 +126,7 @@ class UserManagementTest extends TestCase
         $response->assertSee('従業員管理');
         $response->assertSee('企業A スタッフ');
         $response->assertSee('staff-a@example.com');
+        $response->assertSee('最終ログイン');
     }
 
     #[Test]
@@ -249,6 +250,21 @@ class UserManagementTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('従業員詳細');
         $response->assertSee($this->staffUserA->user_name);
+        $response->assertSee('最終ログイン日時');
+        $response->assertSee('未ログイン');
+    }
+
+    #[Test]
+    public function ログイン済みの従業員詳細画面で最終ログイン日時が表示される(): void
+    {
+        $this->staffUserA->update(['last_login_at' => now()->subDay()]);
+
+        $response = $this->actingAs($this->adminUserA, 'web')
+            ->get("/users/show/{$this->staffUserA->id}");
+
+        $response->assertStatus(200);
+        $response->assertSee('最終ログイン日時');
+        $response->assertSee($this->staffUserA->fresh()->last_login_at->format('Y-m-d'));
     }
 
     #[Test]

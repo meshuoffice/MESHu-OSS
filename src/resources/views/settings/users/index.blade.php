@@ -84,6 +84,7 @@
                         <th>部署 / 役職</th>
                         <th>権限レベル</th>
                         <th>ステータス</th>
+                        <th>最終ログイン</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -116,10 +117,13 @@
                                     <span class="badge bg-danger-subtle text-danger border border-danger-subtle">停止中</span>
                                 @endif
                             </td>
+                            <td class="font-monospace small">
+                                {{ $u->last_login_at ? $u->last_login_at->format('Y-m-d H:i') : '-' }}
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">条件に該当する従業員は見つかりませんでした。</td>
+                            <td colspan="6" class="text-center py-4 text-muted">条件に該当する従業員は見つかりませんでした。</td>
                         </tr>
                     @endforelse
                 </tbody>
