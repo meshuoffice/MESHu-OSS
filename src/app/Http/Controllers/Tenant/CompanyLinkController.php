@@ -86,6 +86,13 @@ class CompanyLinkController extends Controller
             'keyword' => trim((string)$request->query('keyword', '')),
         ];
 
+        $sort = $request->query('sort', 'default');
+
+        // 最新取引起票日（最終依頼日）サブクエリ
+        $latestTxSub = DB::table('transactions')
+            ->select('company_link_id', DB::raw('MAX(created_at) as latest_order_at'))
+            ->groupBy('company_link_id');
+
         // クエリ構築
         $query = DB::table('company_links as cl')
             ->select([
@@ -106,7 +113,9 @@ class CompanyLinkController extends Controller
                 'partner.address as partner_address',
                 'partner.status as partner_company_status',
                 'cb.status as partner_badge_status',
+                'ltx.latest_order_at',
             ])
+            ->leftJoinSub($latestTxSub, 'ltx', 'ltx.company_link_id', '=', 'cl.id')
             ->join('companies as partner', function ($join) use ($companyId) {
                 $join->on('partner.id', '=', DB::raw("CASE WHEN cl.buyer_company_id = {$companyId} THEN cl.seller_company_id ELSE cl.buyer_company_id END"));
             })
@@ -149,8 +158,17 @@ class CompanyLinkController extends Controller
 
         $totalCount = $query->count();
 
-        $rows = $query->orderBy('cl.updated_at', 'desc')
-            ->offset(($page - 1) * $perPage)
+        if ($sort === 'last_order_desc') {
+            // 最終依頼日の降順（nullは末尾）
+            $query->orderByRaw('CASE WHEN ltx.latest_order_at IS NULL THEN 1 ELSE 0 END ASC')
+                  ->orderBy('ltx.latest_order_at', 'desc')
+                  ->orderBy('cl.id', 'desc');
+        } else {
+            // デフォルト（ID降順）
+            $query->orderBy('cl.id', 'desc');
+        }
+
+        $rows = $query->offset(($page - 1) * $perPage)
             ->limit($perPage)
             ->get();
 
@@ -173,6 +191,19 @@ class CompanyLinkController extends Controller
             $addr = $itemArray['partner_address'] ?? '';
             $itemArray['partner_full_address'] = trim($zip . $pref . $city . ' ' . $addr);
             $itemArray['is_authenticated']     = (($itemArray['partner_badge_status'] ?? '') === 'active');
+
+            // 商流の熱力学：最新起票日判定（青・黄・赤）
+            $latestOrderAt = $itemArray['latest_order_at'] ?? null;
+            if (!$latestOrderAt) {
+                $itemArray['last_order_badge'] = 'danger'; // 赤：取引無し
+                $itemArray['last_order_date_formatted'] = '[取引無し]';
+            } else {
+                $dt = \Carbon\Carbon::parse($latestOrderAt);
+                $diffDays = (int)$dt->diffInDays(now());
+                $itemArray['last_order_badge'] = $diffDays <= 30 ? 'primary' : 'warning'; // 30日以内: 青, 30日超: 黄
+                $itemArray['last_order_date_formatted'] = $dt->format('Y/m/d');
+            }
+
             $links[] = $itemArray;
         }
 
@@ -185,6 +216,7 @@ class CompanyLinkController extends Controller
             'perPage'        => $perPage,
             'page'           => $page,
             'filters'        => $filters,
+            'sort'           => $sort,
         ]);
     }
 
@@ -462,6 +494,83 @@ class CompanyLinkController extends Controller
 
         $assignedUserIds = array_map('intval', array_column($assignedUsers, 'user_id'));
 
+        // 商流の熱力学：過去6か月の取引推移集計 (全伝票件数 & 注文回答完了成約金額)
+        $startDate = now()->subMonths(5)->startOfMonth();
+        $endDate   = now()->endOfMonth();
+
+        $transactions = DB::table('transactions')
+            ->where('company_link_id', $linkId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->get();
+
+        $monthlyStats = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $m = now()->subMonths($i);
+            $key = $m->format('Y/m');
+            $monthlyStats[$key] = [
+                'year_month'    => $key,
+                'total_count'   => 0,
+                'success_count' => 0,
+                'total_amount'  => 0.0,
+                'success_rate'  => 0.0,
+                'bar_percent'   => 0,
+            ];
+        }
+
+        foreach ($transactions as $tx) {
+            $ym = \Carbon\Carbon::parse($tx->created_at)->format('Y/m');
+            if (isset($monthlyStats[$ym])) {
+                $monthlyStats[$ym]['total_count']++;
+                if ($tx->status === 'order_accepted') {
+                    $monthlyStats[$ym]['success_count']++;
+                    $monthlyStats[$ym]['total_amount'] += (float)$tx->total_amount;
+                }
+            }
+        }
+
+        $amounts = array_column($monthlyStats, 'total_amount');
+        $maxAmount = max(array_merge([1.0], $amounts));
+        $grandTotalCount   = 0;
+        $grandSuccessCount = 0;
+        $grandTotalAmount  = 0.0;
+
+        foreach ($monthlyStats as &$ms) {
+            if ($ms['total_count'] > 0) {
+                $ms['success_rate'] = round(($ms['success_count'] / $ms['total_count']) * 100, 1);
+            }
+            $ms['bar_percent'] = min(100, (int)round(($ms['total_amount'] / $maxAmount) * 100));
+            $grandTotalCount   += $ms['total_count'];
+            $grandSuccessCount += $ms['success_count'];
+            $grandTotalAmount  += $ms['total_amount'];
+        }
+        unset($ms);
+
+        $grandSuccessRate = $grandTotalCount > 0 ? round(($grandSuccessCount / $grandTotalCount) * 100, 1) : 0.0;
+
+        // 最新取引起票日
+        $latestTxDate = DB::table('transactions')
+            ->where('company_link_id', $linkId)
+            ->max('created_at');
+
+        $lastOrderBadge = 'danger';
+        $lastOrderDateFormatted = '[取引無し]';
+        if ($latestTxDate) {
+            $dt = \Carbon\Carbon::parse($latestTxDate);
+            $diffDays = (int)$dt->diffInDays(now());
+            $lastOrderBadge = $diffDays <= 30 ? 'primary' : 'warning';
+            $lastOrderDateFormatted = $dt->format('Y/m/d');
+        }
+
+        $thermoMetrics = [
+            'monthly_stats'       => array_values($monthlyStats),
+            'grand_total_count'   => $grandTotalCount,
+            'grand_success_count' => $grandSuccessCount,
+            'grand_total_amount'  => $grandTotalAmount,
+            'grand_success_rate'  => $grandSuccessRate,
+            'last_order_date'     => $lastOrderDateFormatted,
+            'last_order_badge'    => $lastOrderBadge,
+        ];
+
         return view('link.detail', [
             'title'           => '取引先企業詳細',
             'activeMenu'      => 'settings',
@@ -472,6 +581,7 @@ class CompanyLinkController extends Controller
             'assignedUsers'   => $assignedUsers,
             'companyUsers'    => $companyUsers,
             'assignedUserIds' => $assignedUserIds,
+            'thermoMetrics'   => $thermoMetrics,
         ]);
     }
 

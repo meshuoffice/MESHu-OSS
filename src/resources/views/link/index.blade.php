@@ -60,21 +60,36 @@
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0 fw-bold fs-6">連携企業一覧 (全 {{ count($links) }} 件)</h5>
     </div>
-    <div class="table-responsive" style="min-height: 220px;">
+    <div class="table-responsive" style="min-height: 360px;">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th scope="col" style="width: 60px;">ID</th>
+                    <th scope="col" style="width: 75px;">
+                        <span>ID</span>
+                        @if (($sort ?? '') === 'last_order_desc')
+                            <a href="{{ route('tenant.link.index', array_merge(request()->query(), ['sort' => null])) }}" class="text-decoration-none text-primary ms-1" title="ID順（元に戻す）">
+                                <i class="bi bi-arrow-down"></i>
+                            </a>
+                        @endif
+                    </th>
                     <th scope="col">取引先企業名</th>
                     <th scope="col">自社属性</th>
+                    <th scope="col" style="width: 150px;">
+                        <span>最終依頼日</span>
+                        @if (($sort ?? '') !== 'last_order_desc')
+                            <a href="{{ route('tenant.link.index', array_merge(request()->query(), ['sort' => 'last_order_desc'])) }}" class="text-decoration-none text-primary ms-1" title="最終依頼日の降順に並び替え">
+                                <i class="bi bi-arrow-down"></i>
+                            </a>
+                        @endif
+                    </th>
                     <th scope="col">ステータス</th>
-                    <th scope="col" class="text-end" style="width: 160px;">操作</th>
+                    <th scope="col" class="text-end" style="width: 140px;">操作</th>
                 </tr>
             </thead>
             <tbody>
                 @if (empty($links))
                     <tr>
-                        <td colspan="5" class="text-center py-4 text-muted">該当する連携企業が存在しません。</td>
+                        <td colspan="6" class="text-center py-4 text-muted">該当する連携企業が存在しません。</td>
                     </tr>
                 @else
                     @foreach ($links as $item)
@@ -99,6 +114,11 @@
                                 @endif
                             </td>
                             <td>
+                                <span class="badge bg-{{ $item['last_order_badge'] }} {{ $item['last_order_badge'] === 'warning' ? 'text-dark' : 'text-white' }} font-monospace px-2 py-1">
+                                    {{ $item['last_order_date_formatted'] }}
+                                </span>
+                            </td>
+                            <td>
                                 @if ($item['link_status'] === 'approved')
                                     <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>承認済み</span>
                                 @elseif ($item['link_status'] === 'pending')
@@ -113,7 +133,7 @@
                             </td>
                             <td class="text-end">
                                 <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-boundary="window" aria-expanded="false">メニュー</button>
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">メニュー</button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                                         <li><a class="dropdown-item" href="{{ route('tenant.link.detail', ['link_id' => $item['link_id']]) }}"><i class="bi bi-eye me-2 text-muted"></i>企業詳細を見る</a></li>
                                         
