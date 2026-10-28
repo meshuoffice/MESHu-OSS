@@ -71,6 +71,88 @@
 <!-- メインレイアウト (左8カラム / 右4カラム) -->
 <div class="row g-4">
     <div class="col-12 col-lg-8">
+        <!-- 0. 過去6か月の取引推移 (商流の熱力学指標) -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="card-title mb-0 fw-bold fs-6"><i class="bi bi-graph-up me-2 text-primary"></i>過去6か月の取引推移</h5>
+                <span class="badge bg-{{ $thermoMetrics['last_order_badge'] }} {{ $thermoMetrics['last_order_badge'] === 'warning' ? 'text-dark' : 'text-white' }} font-monospace px-2 py-1">
+                    最終依頼日: {{ $thermoMetrics['last_order_date'] }}
+                </span>
+            </div>
+            <div class="card-body p-4">
+                <!-- KPIサマリーカード 3枚 -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-4">
+                        <div class="p-3 bg-light rounded border h-100">
+                            <div class="text-muted small fw-semibold mb-1">
+                                <i class="bi bi-file-earmark-text me-1 text-primary"></i>取引件数 (全伝票/注文回答)
+                            </div>
+                            <div class="h3 fw-bold text-dark m-0">{{ number_format($thermoMetrics['grand_total_count']) }} <span class="fs-6 fw-normal text-muted">件</span> <span class="text-secondary fw-light">/</span> {{ number_format($thermoMetrics['grand_success_count']) }} <span class="fs-6 fw-normal text-muted">件</span></div>
+                            <div class="small text-muted mt-1">起票総数 / 成約件数</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="p-3 bg-light rounded border h-100">
+                            <div class="text-muted small fw-semibold mb-1">
+                                <i class="bi bi-cash-coin me-1 text-success"></i>取引金額 (成約完了分)
+                            </div>
+                            <div class="h3 fw-bold text-success m-0">¥{{ number_format($thermoMetrics['grand_total_amount']) }}</div>
+                            <div class="small text-muted mt-1">注文回答完了分の合計金額</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="p-3 bg-light rounded border h-100">
+                            <div class="text-muted small fw-semibold mb-1">
+                                <i class="bi bi-pie-chart me-1 text-info"></i>成約率
+                            </div>
+                            <div class="h3 fw-bold text-info m-0">{{ number_format($thermoMetrics['grand_success_rate'], 1) }} <span class="fs-6 fw-normal text-muted">%</span></div>
+                            <div class="small text-muted mt-1">成約件数 / 起票総数</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 月別推移テーブル -->
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light small text-muted">
+                            <tr>
+                                <th scope="col">年月</th>
+                                <th scope="col" class="text-center">取引件数 (全伝票/注文回答)</th>
+                                <th scope="col" class="text-end">取引金額 (成約分)</th>
+                                <th scope="col" class="text-center">成約率</th>
+                                <th scope="col" style="width: 25%;">推移</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($thermoMetrics['monthly_stats'] as $ms)
+                                <tr>
+                                    <td class="fw-bold font-monospace">{{ $ms['year_month'] }}</td>
+                                    <td class="text-center"><span class="badge bg-secondary-subtle text-dark px-2 font-monospace">{{ $ms['total_count'] }}件 / {{ $ms['success_count'] }}件</span></td>
+                                    <td class="text-end font-monospace fw-semibold {{ $ms['total_amount'] > 0 ? 'text-dark' : 'text-muted' }}">
+                                        ¥{{ number_format($ms['total_amount']) }}
+                                    </td>
+                                    <td class="text-center">
+                                        @if ($ms['total_count'] > 0)
+                                            <span class="badge {{ $ms['success_rate'] >= 50 ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-muted' }}">
+                                                {{ number_format($ms['success_rate'], 1) }}%
+                                            </span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ $ms['bar_percent'] }}%;"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- 1. 企業プロフィール情報 -->
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white py-3">

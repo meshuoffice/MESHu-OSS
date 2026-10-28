@@ -429,4 +429,139 @@ class CompanyLinkTest extends TestCase
         $response->assertSee('企業を招待する');
         $response->assertSee(route('tenant.invitation.new'));
     }
+    #[Test]
+    public function 最終依頼日の青黄赤バッジが正しく判定され一覧に表示される(): void
+    {
+        // リンク1: 直近3日前起票 (青: primary)
+        $linkBlue = CompanyLink::create([
+            'buyer_company_id'  => $this->companyA->id,
+            'seller_company_id' => $this->companyB->id,
+            'status'            => 'approved',
+        ]);
+        $txBlue = \App\Models\Transaction::create([
+            'company_link_id' => $linkBlue->id,
+            'title'           => '直近案件',
+            'status'          => 'order_accepted',
+            'total_amount'    => 100000,
+        ]);
+        \Illuminate\Support\Facades\DB::table('transactions')->where('id', $txBlue->id)->update([
+            'created_at' => now()->subDays(3),
+        ]);
+
+        // リンク2: 40日前起票 (黄: warning)
+        $linkYellow = CompanyLink::create([
+            'buyer_company_id'  => $this->companyA->id,
+            'seller_company_id' => $this->companyC->id,
+            'status'            => 'approved',
+        ]);
+        $txYellow = \App\Models\Transaction::create([
+            'company_link_id' => $linkYellow->id,
+            'title'           => '過去案件',
+            'status'          => 'order_accepted',
+            'total_amount'    => 200000,
+        ]);
+        \Illuminate\Support\Facades\DB::table('transactions')->where('id', $txYellow->id)->update([
+            'created_at' => now()->subDays(40),
+        ]);
+
+        $response = $this->actingAs($this->adminUserA, 'web')->get('/link');
+        $response->assertStatus(200);
+
+        // 青バッジと日付
+        $response->assertSee('bg-primary text-white font-monospace px-2 py-1', false);
+        $response->assertSee(now()->subDays(3)->format('Y/m/d'));
+
+        // 黄色バッジと日付
+        $response->assertSee('bg-warning text-dark font-monospace px-2 py-1', false);
+        $response->assertSee(now()->subDays(40)->format('Y/m/d'));
+    }
+
+    #[Test]
+    public function 最終依頼日の降順でソートできる(): void
+    {
+        // リンク1: 取引なし
+        $linkNoTx = CompanyLink::create([
+            'buyer_company_id'  => $this->companyA->id,
+            'seller_company_id' => $this->companyC->id,
+            'status'            => 'approved',
+        ]);
+
+        // リンク2: 5日前起票
+        $linkRecent = CompanyLink::create([
+            'buyer_company_id'  => $this->companyA->id,
+            'seller_company_id' => $this->companyB->id,
+            'status'            => 'approved',
+        ]);
+        $txRecent = \App\Models\Transaction::create([
+            'company_link_id' => $linkRecent->id,
+            'title'           => '最新案件',
+            'status'          => 'order_accepted',
+            'total_amount'    => 50000,
+        ]);
+        \Illuminate\Support\Facades\DB::table('transactions')->where('id', $txRecent->id)->update([
+            'created_at' => now()->subDays(5),
+        ]);
+
+        // 最終依頼日 降順ソート
+        $response = $this->actingAs($this->adminUserA, 'web')->get('/link?sort=last_order_desc');
+        $response->assertStatus(200);
+
+        // ID順に戻すリンクが存在すること、かつ最終依頼日側のソートリンクは非表示になること
+        $response->assertSee('title="ID順（元に戻す）"', false);
+        $response->assertDontSee('title="最終依頼日の降順に並び替え"', false);
+
+        // 画面上の順序: $linkRecent (#ID) が $linkNoTx (#ID) より前に登場する
+        $content = $response->getContent();
+        $posRecent = strpos($content, "#{$linkRecent->id}");
+        $posNoTx   = strpos($content, "#{$linkNoTx->id}");
+
+        $this->assertNotFalse($posRecent);
+        $this->assertNotFalse($posNoTx);
+        $this->assertTrue($posRecent < $posNoTx, '最新取引起票日があるリンクが未取引リンクより先頭に配置されること');
+    }
+
+    #[Test]
+    public function 企業詳細画面で過去6か月の取引推移が正しく集計される(): void
+    {
+        $link = CompanyLink::create([
+            'buyer_company_id'  => $this->companyA->id,
+            'seller_company_id' => $this->companyB->id,
+            'status'            => 'approved',
+        ]);
+
+        // 伝票1: 見積依頼 (未成約) -> 件数にカウント、金額は0
+        $tx1 = \App\Models\Transaction::create([
+            'company_link_id' => $link->id,
+            'title'           => '見積引合',
+            'status'          => 'estimate_request',
+            'total_amount'    => 500000,
+        ]);
+        \Illuminate\Support\Facades\DB::table('transactions')->where('id', $tx1->id)->update([
+            'created_at' => now()->subDays(10),
+        ]);
+
+        // 伝票2: 注文完了 (成約) -> 件数にカウント、成約金額に加算
+        $tx2 = \App\Models\Transaction::create([
+            'company_link_id' => $link->id,
+            'title'           => '受注成約',
+            'status'          => 'order_accepted',
+            'total_amount'    => 300000,
+        ]);
+        \Illuminate\Support\Facades\DB::table('transactions')->where('id', $tx2->id)->update([
+            'created_at' => now()->subDays(5),
+        ]);
+
+        $response = $this->actingAs($this->adminUserA, 'web')->get("/link/detail/{$link->id}");
+        $response->assertStatus(200);
+
+        // 過去6か月の取引推移カードが表示される
+        $response->assertSee('過去6か月の取引推移');
+        // 全伝票件数 / 成約件数: 2 件 / 1 件
+        $response->assertSee('2 <span class="fs-6 fw-normal text-muted">件</span>', false);
+        $response->assertSee('1 <span class="fs-6 fw-normal text-muted">件</span>', false);
+        // 成約完了金額: ¥300,000 (見積依頼の500,000は含まれない)
+        $response->assertSee('¥300,000');
+        // 成約率: 50.0%
+        $response->assertSee('50.0 <span class="fs-6 fw-normal text-muted">%</span>', false);
+    }
 }
