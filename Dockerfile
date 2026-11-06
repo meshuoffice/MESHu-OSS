@@ -4,10 +4,12 @@ FROM almalinux:9
 # 1. dnfの除外設定を解除してアップデート
 RUN sed -i 's/tsflags=nodocs//g' /etc/dnf/dnf.conf
 
-# 2. EPEL、Remiリポジトリ、PHP 8.2、PostgreSQLクライアント、日本語パッケージのインストール
+# 2. EPEL、Remiリポジトリ、PostgreSQL 16、PHP 8.2、日本語パッケージのインストール
 RUN dnf -y update && \
     dnf -y install epel-release && \
     dnf -y install https://rpms.remirepo.net/enterprise/remi-release-9.rpm && \
+    dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
+    dnf -y module disable postgresql && \
     dnf -y module enable php:remi-8.2 -y && \
     dnf -y install \
         php \
@@ -27,8 +29,10 @@ RUN dnf -y update && \
         php-opcache \
         unzip \
         git \
-        postgresql && \
+        postgresql16 && \
     dnf -y install glibc-langpack-ja langpacks-ja glibc-common && \
+    ln -sf /usr/pgsql-16/bin/pg_dump /usr/bin/pg_dump && \
+    ln -sf /usr/pgsql-16/bin/psql /usr/bin/psql && \
     dnf clean all
 
 RUN sed -i 's/;clear_env = no/clear_env = no/g' /etc/php-fpm.d/www.conf
