@@ -1,4 +1,4 @@
-# MESHu セキュリティ検証仕様書 & 監査レポート（Security Audits & Penetration Test Reports）
+﻿# MESHu セキュリティ検証仕様書 & 監査レポート（Security Audits & Penetration Test Reports）
 
 自律分散型B2B受発注プロトコル「MESHu」における、マルチテナント認可制御（IDOR対策）、境界防御、および深層ビジネスロジックの堅牢性を実証するための公開セキュリティドキュメントです。
 
@@ -27,5 +27,6 @@ B2B取引において最も致命的となる「他社データの盗聴」お�
 ## 3. 実証実験・解説記事（Zenn連載）
 本セキュリティ仕様書の策定背景、現場AI社員「alisa」が自律立案した経緯、および画面キャプチャを含む詳細な実証記録は、Zenn記事にて公開されています。
 
-- 🔗 **Zenn第13弾:** [10年前のCeleronノートに住むAI社員を「ブラック化」させたら、自社B2Bシステムの急所を容赦なく突いてきた話【自律型AIペンテスト実践】](https://zenn.dev/meshu/articles/※公開後URL)
+- 🔗 **Zenn第13弾:** [10年前のCeleronノートに住むAI社員を「ブラック化」させたら、自社B2Bシステムの急所を容赦なく突いてきた話【自律型AIペンテスト実践】](https://zenn.dev/meshu/articles/49cf04d3e23ec4)
+
 
