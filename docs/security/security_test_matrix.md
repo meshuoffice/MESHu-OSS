@@ -4,7 +4,7 @@
 - 実施担当: 現場AI社員 alisa（セキュリティ監査・品質管理）
 - 対象環境:
   1. **アプリケーション層（mshoss環境）**: `http://mshoss:8080`
-  2. **インフラ・OS層（本番環境 meshu.org）**: `https://meshu.org` (IP: `133.242.169.7`)
+  2. **インフラ・OS層（本番環境 meshu.org）**: `https://meshu.org`
 
 ---
 
