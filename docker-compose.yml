@@ -5,7 +5,7 @@
 services:
   # 1. Webサーバー (Nginx公式)
   web:
-    image: nginx:1.25-alpine
+    image: nginx:alpine
     container_name: meshu-laravel-web
     restart: unless-stopped
     ports:
